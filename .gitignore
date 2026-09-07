@@ -1,0 +1,8 @@
+.DS_Store
+build/
+build-ipad/
+build-device/
+DerivedData/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
