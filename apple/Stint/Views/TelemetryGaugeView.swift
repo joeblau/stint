@@ -16,9 +16,15 @@ struct TelemetryGaugeView: View {
     @AppStorage("telemetry-speed-unit") private var unit = GaugeSpeedUnit.kph
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private static let speedGradient = AngularGradient(
-        colors: [StintPalette.pitGray, Color(hex: "#D2D2D2"), StintPalette.white],
-        center: .center, startAngle: .degrees(135), endAngle: .degrees(405))
+    @Environment(\.colorScheme) private var colorScheme
+
+    private var ink: Color { colorScheme == .dark ? StintPalette.white : StintPalette.trackBlack }
+    private var speedInk: Color { colorScheme == .dark ? StintPalette.trackBlack : StintPalette.white }
+    private var speedGradient: AngularGradient { AngularGradient(
+        colors: colorScheme == .dark
+            ? [StintPalette.pitGray, Color(hex: "#D2D2D2"), StintPalette.white]
+            : [StintPalette.pitGray, StintPalette.asphalt, StintPalette.trackBlack],
+        center: .center, startAngle: .degrees(135), endAngle: .degrees(405)) }
     private static let throttleGradient = AngularGradient(
         colors: [Color(hex: "#28734B"), StintPalette.telemetryActive, Color(hex: "#B7E9CA")],
         center: .center, startAngle: .degrees(135), endAngle: .degrees(263))
@@ -32,13 +38,13 @@ struct TelemetryGaugeView: View {
 
     var body: some View {
         ZStack {
-            arc(start: 135, end: 405, radius: 0.444, width: 0.09, color: StintPalette.white.opacity(0.16))
-            arc(start: 135, end: 135 + 270 * speedFraction, radius: 0.444, width: 0.09, color: Self.speedGradient)
+            arc(start: 135, end: 405, radius: 0.444, width: 0.09, color: ink.opacity(0.16))
+            arc(start: 135, end: 135 + 270 * speedFraction, radius: 0.444, width: 0.09, color: speedGradient)
                 .animation(reduceMotion ? nil : .linear(duration: 0.12), value: speedFraction)
 
             // Independent pedal tracks, both filling from the bottom toward the top.
-            arc(start: 135, end: 263, radius: 0.342, width: 0.07, color: StintPalette.white.opacity(0.14))
-            arc(start: 277, end: 405, radius: 0.342, width: 0.07, color: StintPalette.white.opacity(0.14))
+            arc(start: 135, end: 263, radius: 0.342, width: 0.07, color: ink.opacity(0.14))
+            arc(start: 277, end: 405, radius: 0.342, width: 0.07, color: ink.opacity(0.14))
             arc(start: 135, end: 135 + 128 * throttle, radius: 0.342, width: 0.07, color: Self.throttleGradient)
                 .animation(reduceMotion ? nil : .linear(duration: 0.12), value: throttle)
             arc(start: 405 - 128 * brake, end: 405, radius: 0.342, width: 0.07, color: Self.red)
@@ -78,7 +84,7 @@ struct TelemetryGaugeView: View {
                 Text("\(Int(value))")
                     .font(.system(size: diameter * 0.044, weight: .semibold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(value <= (speed ?? -1) ? StintPalette.trackBlack : StintPalette.white.opacity(0.85))
+                    .foregroundStyle(value <= (speed ?? -1) ? speedInk : ink.opacity(0.85))
                     .rotationEffect(.degrees(tangent > 90 && tangent < 270 ? tangent + 180 : tangent))
                     .position(point(at: angle, radius: diameter * 0.444))
             }
@@ -92,7 +98,7 @@ struct TelemetryGaugeView: View {
                 let angle = centerAngle + (Double(index) - Double(letters.count - 1) / 2) * 4.5
                 Text(String(letters[index]))
                     .font(.system(size: diameter * 0.039, weight: .semibold))
-                    .foregroundStyle(StintPalette.white.opacity(0.9))
+                    .foregroundStyle(ink.opacity(0.9))
                     .shadow(color: StintPalette.trackBlack.opacity(0.45), radius: 1)
                     .rotationEffect(.degrees(angle + 90))
                     .position(point(at: angle, radius: diameter * 0.342))
@@ -109,11 +115,11 @@ struct TelemetryGaugeView: View {
                     RollingDigits(text: speed.map { "\(Int($0.rounded()))" } ?? "—", value: speed ?? 0, animated: !reduceMotion)
                         .font(.system(size: diameter * 0.18, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .foregroundStyle(StintPalette.white)
+                        .foregroundStyle(ink)
                         .lineLimit(1)
                     Text(unit.label)
                         .font(.system(size: diameter * 0.047, weight: .medium)).tracking(1)
-                        .foregroundStyle(StintPalette.white.opacity(0.6))
+                        .foregroundStyle(ink.opacity(0.6))
                 }
                 .frame(width: diameter * 0.49, height: diameter * 0.26)
                 .contentShape(Rectangle())
@@ -127,21 +133,21 @@ struct TelemetryGaugeView: View {
             .help("Click to switch km/h and mph")
 
             VStack(spacing: 0) {
-                RollingDigits(text: telemetry.rpm.map { "\($0)" } ?? "—", value: Double(telemetry.rpm ?? 0), animated: !reduceMotion)
+                RollingDigits(text: telemetry.rpm.map { $0.formatted(.number.grouping(.automatic)) } ?? "—", value: Double(telemetry.rpm ?? 0), animated: !reduceMotion)
                     .font(.system(size: diameter * 0.074, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(StintPalette.white)
+                    .foregroundStyle(ink)
                 Text("RPM")
                     .font(.system(size: diameter * 0.043, weight: .medium)).tracking(1)
-                    .foregroundStyle(StintPalette.white.opacity(0.55))
+                    .foregroundStyle(ink.opacity(0.55))
             }
             .position(x: diameter * 0.5, y: diameter * 0.55)
             .accessibilityElement(children: .combine)
 
             Text("DRS")
                 .font(.system(size: diameter * 0.047, weight: .bold))
-                .foregroundStyle(telemetry.drs ? StintPalette.trackBlack : StintPalette.white.opacity(0.7))
+                .foregroundStyle(telemetry.drs ? StintPalette.trackBlack : ink.opacity(0.7))
                 .padding(.horizontal, diameter * 0.04).padding(.vertical, diameter * 0.01)
-                .background(telemetry.drs ? StintPalette.telemetryActive : StintPalette.white.opacity(0.14),
+                .background(telemetry.drs ? StintPalette.telemetryActive : ink.opacity(0.14),
                             in: RoundedRectangle(cornerRadius: diameter * 0.025))
                 .overlay(RoundedRectangle(cornerRadius: diameter * 0.025)
                     .strokeBorder(telemetry.drs ? StintPalette.telemetryActive : .clear, lineWidth: 1))
@@ -152,11 +158,11 @@ struct TelemetryGaugeView: View {
 
             HStack(alignment: .firstTextBaseline, spacing: diameter * 0.018) {
                 Text("GEAR").font(.system(size: diameter * 0.047, weight: .medium)).tracking(1)
-                    .foregroundStyle(StintPalette.white.opacity(0.55))
+                    .foregroundStyle(ink.opacity(0.55))
                 RollingDigits(text: telemetry.gear.map { "\($0)" } ?? "—", value: Double(telemetry.gear ?? 0), animated: !reduceMotion)
                     .font(.system(size: diameter * 0.088, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(StintPalette.white)
+                    .foregroundStyle(ink)
             }
             .position(x: diameter * 0.5, y: diameter * 0.79)
             .accessibilityElement(children: .combine)

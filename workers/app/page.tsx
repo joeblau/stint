@@ -35,12 +35,12 @@ export default function Home() {
           Grand Prix from the cockpit, the pit wall, or orbit.
         </p>
         <div className={styles.actions}>
-          <a className={styles.primary} href="#download">
+          <a className={styles.primary} href="https://github.com/joeblau/stint/releases/latest/download/Stint-macOS.zip">
             Download for Mac
           </a>
-          <a className={styles.secondary} href="#download">
-            iPad
-          </a>
+          <span className={styles.secondaryDisabled} aria-disabled="true" title="iPad build coming soon">
+            iPad · soon
+          </span>
         </div>
       </section>
 

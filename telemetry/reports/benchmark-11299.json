@@ -1,0 +1,187 @@
+{
+  "sessionKey": 11299,
+  "runtime": "1.4.0",
+  "geometryVerified": false,
+  "notes": [
+    "Experimental reference trajectory; error against withheld fixes is not independent ground truth.",
+    "Acceleration and backwards comparisons use matched accepted edges. Raw teleport count covers all edges; rejected motion remains unavailable.",
+    "Lateral residual change is a jitter proxy; projected residual is zero by construction, not proof of accuracy.",
+    "Lookup timing excludes rendering; baseline is raw XY interpolation, matching the existing algorithm, not an instrumented Swift build."
+  ],
+  "totals": {
+    "drivers": 2,
+    "rows": 16174,
+    "processingMS": 181.60416599999996,
+    "rawBytes": 22247958,
+    "gzipBytes": 1838521,
+    "jsonBytes": 25513685,
+    "serializeCompressMS": 157.98095800000002,
+    "loadMS": 65.76662500000002
+  },
+  "drivers": [
+    {
+      "driver": 1,
+      "rows": 8087,
+      "acceptedEdges": 2345,
+      "coverage": 0.29000742023250065,
+      "loadMS": 34.345457999999994,
+      "processingMS": 96.559958,
+      "serializeCompressMS": 75.043916,
+      "jsonBytes": 12672276,
+      "gzipBytes": 874771,
+      "playbackUS": 0.6103154099999998,
+      "baselineLookupUS": 0.13770125000000008,
+      "checksum": -362903325.8019445,
+      "intervalsUS": {
+        "count": 8086,
+        "mean": 828141.3554291368,
+        "p50": 240000,
+        "p95": 420000,
+        "p99": 520000,
+        "max": 3011436000
+      },
+      "raw": {
+        "accelerationAbsoluteMPS2": {
+          "count": 2315,
+          "mean": 39.513278198049036,
+          "p50": 18.4747940890524,
+          "p95": 132.97994529338175,
+          "p99": 220.68818517913368
+        },
+        "lateralResidualChangeMeters": {
+          "count": 2345,
+          "mean": 0.18499778410681836,
+          "p50": 0.035879388604553426,
+          "p95": 0.6798242040282082,
+          "p99": 2.7236143126848074
+        },
+        "backwards": 2,
+        "teleports": 2
+      },
+      "normalized": {
+        "accelerationAbsoluteMPS2": {
+          "count": 2315,
+          "mean": 39.36060441730914,
+          "p50": 18.474794089052438,
+          "p95": 133.5192196608416,
+          "p99": 219.994195469367
+        },
+        "lateralResidualChangeMeters": {
+          "count": 2345,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "backwards": 0,
+        "teleports": 0
+      },
+      "heldOut": {
+        "linearMeters": {
+          "count": 528,
+          "mean": 1.6406887968191473,
+          "p50": 0.9260430788140042,
+          "p95": 5.660978018414021,
+          "p99": 7.864057247691745
+        },
+        "hermiteMeters": {
+          "count": 528,
+          "mean": 1.5662779543274676,
+          "p50": 0.8377684744873459,
+          "p95": 5.746617769212449,
+          "p99": 7.662074771920478
+        },
+        "anchoredSpeedMeters": {
+          "count": 528,
+          "mean": 1.595268320379077,
+          "p50": 0.9617251840688592,
+          "p95": 5.751346534588137,
+          "p99": 7.708351713400489
+        },
+        "speedRejected": 48
+      }
+    },
+    {
+      "driver": 16,
+      "rows": 8087,
+      "acceptedEdges": 2482,
+      "coverage": 0.30695028444224587,
+      "loadMS": 31.421167000000025,
+      "processingMS": 85.04420799999997,
+      "serializeCompressMS": 82.93704200000002,
+      "jsonBytes": 12841409,
+      "gzipBytes": 963750,
+      "playbackUS": 0.48844500000000035,
+      "baselineLookupUS": 0.13557666999999926,
+      "checksum": -363626269.90721536,
+      "intervalsUS": {
+        "count": 8086,
+        "mean": 828141.3554291368,
+        "p50": 240000,
+        "p95": 420000,
+        "p99": 520000,
+        "max": 3011436000
+      },
+      "raw": {
+        "accelerationAbsoluteMPS2": {
+          "count": 2443,
+          "mean": 42.13156255432989,
+          "p50": 18.98040984636598,
+          "p95": 156.02280884828,
+          "p99": 239.6368060133405
+        },
+        "lateralResidualChangeMeters": {
+          "count": 2482,
+          "mean": 0.24123294868543485,
+          "p50": 0.05583149491865979,
+          "p95": 0.9523287084787315,
+          "p99": 2.406078304731243
+        },
+        "backwards": 0,
+        "teleports": 5
+      },
+      "normalized": {
+        "accelerationAbsoluteMPS2": {
+          "count": 2443,
+          "mean": 43.02881533726412,
+          "p50": 19.559091433503838,
+          "p95": 157.5580966877927,
+          "p99": 240.9947217872024
+        },
+        "lateralResidualChangeMeters": {
+          "count": 2482,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "backwards": 0,
+        "teleports": 0
+      },
+      "heldOut": {
+        "linearMeters": {
+          "count": 503,
+          "mean": 1.6978442172438075,
+          "p50": 0.8930506284636035,
+          "p95": 5.518308875762926,
+          "p99": 7.946108450190366
+        },
+        "hermiteMeters": {
+          "count": 503,
+          "mean": 1.6082040863493536,
+          "p50": 0.8215715905596124,
+          "p95": 5.595368563802246,
+          "p99": 7.739841633368581
+        },
+        "anchoredSpeedMeters": {
+          "count": 503,
+          "mean": 1.6278516846648878,
+          "p50": 0.8781635319115297,
+          "p95": 5.613842778420645,
+          "p99": 7.716752612213174
+        },
+        "speedRejected": 44
+      }
+    }
+  ]
+}

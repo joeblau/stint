@@ -1,0 +1,7 @@
+{
+  "name": "@stint/telemetry",
+  "private": true,
+  "type": "module",
+  "scripts": {"test": "bun test", "ingest": "bun scripts/ingest.ts", "audit": "bun scripts/audit.ts", "normalize": "bun scripts/normalize.ts", "benchmark": "bun scripts/benchmark.ts", "typecheck": "tsc --noEmit"},
+  "devDependencies": {"@types/bun": "^1.3.0", "typescript": "^5.9.0"}
+}

@@ -1,9 +1,18 @@
 {
-  "name": "stint",
+  "name": "stint-monorepo",
   "private": true,
+  "packageManager": "bun@1.4.0",
+  "workspaces": [
+    "apple",
+    "workers"
+  ],
   "scripts": {
-    "mac:stint": "bash Scripts/run-mac.sh",
-    "ipad:stint": "bun Scripts/run-ipad.ts",
-    "ipad:stint:sim": "bun Scripts/run-ipad-simulator.ts"
+    "dev": "turbo run dev",
+    "mac:stint": "turbo run mac:stint",
+    "ipad:stint": "turbo run ipad:stint",
+    "ipad:stint:sim": "turbo run ipad:stint:sim"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0"
   }
 }

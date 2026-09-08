@@ -1,0 +1,341 @@
+{
+  "path": "apple/races/2026-09-06-monza.json",
+  "bytes": 14209638,
+  "decodeMS": 23.367290999999998,
+  "notes": [
+    "Version-1 geographic replay has no original timestamps, XYZ or source provenance; it cannot recover the lost original samples.",
+    "Lookup mirrors DriverRecording.position(at:) coordinate interpolation; timing is Bun, not Swift or render-thread profiling."
+  ],
+  "drivers": [
+    {
+      "driver": 1,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.19555082999999998,
+      "checksum": 4562162.613189959
+    },
+    {
+      "driver": 3,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.179125,
+      "checksum": 4562176.374201404
+    },
+    {
+      "driver": 5,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.18268958999999996,
+      "checksum": 4562145.652745221
+    },
+    {
+      "driver": 10,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.17280375000000006,
+      "checksum": 4562175.402418706
+    },
+    {
+      "driver": 11,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.14423249999999996,
+      "checksum": 4562133.164598855
+    },
+    {
+      "driver": 12,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.15048332999999986,
+      "checksum": 4562147.558999772
+    },
+    {
+      "driver": 14,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11797833999999996,
+      "checksum": 4561911.858196111
+    },
+    {
+      "driver": 16,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11310125,
+      "checksum": 4561715.683067721
+    },
+    {
+      "driver": 18,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11151209000000023,
+      "checksum": 4562189.9571362855
+    },
+    {
+      "driver": 22,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11265458999999993,
+      "checksum": 4562140.708371207
+    },
+    {
+      "driver": 23,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.1126608300000001,
+      "checksum": 4562127.103401058
+    },
+    {
+      "driver": 27,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11216667000000001,
+      "checksum": 4562144.328770376
+    },
+    {
+      "driver": 30,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11131666999999994,
+      "checksum": 4562138.710491885
+    },
+    {
+      "driver": 31,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.1126124999999999,
+      "checksum": 4562148.566066833
+    },
+    {
+      "driver": 41,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11057249999999982,
+      "checksum": 4562160.830402927
+    },
+    {
+      "driver": 43,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11145624999999997,
+      "checksum": 4562167.123903496
+    },
+    {
+      "driver": 44,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11135791999999982,
+      "checksum": 4562158.481109835
+    },
+    {
+      "driver": 55,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.1112858399999999,
+      "checksum": 4562135.836745947
+    },
+    {
+      "driver": 63,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.1268633299999999,
+      "checksum": 4562179.737660258
+    },
+    {
+      "driver": 77,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11485333000000025,
+      "checksum": 4562125.750841786
+    },
+    {
+      "driver": 81,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.11185499999999991,
+      "checksum": 4562162.363086375
+    },
+    {
+      "driver": 87,
+      "samples": 7304,
+      "intervalsUS": {
+        "count": 7303,
+        "mean": 1001506.2303163083,
+        "p50": 1000000,
+        "p95": 1000000,
+        "p99": 1000000,
+        "max": 2000000
+      },
+      "missingSpeed": 7304,
+      "lookupUS": 0.10952707999999974,
+      "checksum": 4562157.9246392585
+    }
+  ]
+}

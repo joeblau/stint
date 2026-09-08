@@ -84,6 +84,17 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+.secondaryDisabled {
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  cursor: default;
+}
+
 .featuresSection {
   max-width: 1080px;
   margin: 0 auto;

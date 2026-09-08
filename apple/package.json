@@ -1,0 +1,10 @@
+{
+  "name": "stint",
+  "private": true,
+  "scripts": {
+    "mac:stint": "bash Scripts/run-mac.sh",
+    "ipad:stint": "bun Scripts/run-ipad.ts",
+    "ipad:stint:sim": "bun Scripts/run-ipad-simulator.ts",
+    "release:mac": "bash Scripts/release-mac.sh"
+  }
+}

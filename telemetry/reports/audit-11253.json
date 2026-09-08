@@ -1,0 +1,252 @@
+[
+  {
+    "driver": 1,
+    "endpoints": {
+      "location": {
+        "rows": 35735,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 2,
+        "intervalsUS": {
+          "count": 35732,
+          "mean": 262460.56755849096,
+          "p50": 240000,
+          "p95": 420000,
+          "p99": 520000,
+          "max": 3900000
+        }
+      },
+      "car_data": {
+        "rows": 34764,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 3,
+        "intervalsUS": {
+          "count": 34760,
+          "mean": 269797.15189873416,
+          "p50": 240000,
+          "p95": 440000,
+          "p99": 520000,
+          "max": 1400000
+        }
+      },
+      "laps": {
+        "rows": 53,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 52,
+          "mean": 100264769.23076923,
+          "p50": 94718000,
+          "p95": 140336000,
+          "p99": 147147000,
+          "max": 150923000
+        }
+      },
+      "pit": {
+        "rows": 1,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      },
+      "position": {
+        "rows": 16,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 15,
+          "mean": 595155533.3333334,
+          "p50": 79996000,
+          "p95": 2583238000,
+          "p99": 2583238000,
+          "max": 3820166000
+        }
+      },
+      "intervals": {
+        "rows": 1426,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 1425,
+          "mean": 3720778.947368421,
+          "p50": 3673000,
+          "p95": 6472000,
+          "p99": 8384000,
+          "max": 31495000
+        }
+      },
+      "stints": {
+        "rows": 2,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 2,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      },
+      "race_control": {
+        "rows": 49,
+        "outOfOrder": 1,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 48,
+          "mean": 182000000,
+          "p50": 48000000,
+          "p95": 699000000,
+          "p99": 925000000,
+          "max": 1267000000
+        }
+      }
+    }
+  },
+  {
+    "driver": 16,
+    "endpoints": {
+      "location": {
+        "rows": 35735,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 2,
+        "intervalsUS": {
+          "count": 35732,
+          "mean": 262460.56755849096,
+          "p50": 240000,
+          "p95": 420000,
+          "p99": 520000,
+          "max": 3900000
+        }
+      },
+      "car_data": {
+        "rows": 34764,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 3,
+        "intervalsUS": {
+          "count": 34760,
+          "mean": 269797.15189873416,
+          "p50": 240000,
+          "p95": 440000,
+          "p99": 520000,
+          "max": 1400000
+        }
+      },
+      "laps": {
+        "rows": 53,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 52,
+          "mean": 100123519.23076923,
+          "p50": 94321000,
+          "p95": 142145000,
+          "p99": 147126000,
+          "max": 151538000
+        }
+      },
+      "pit": {
+        "rows": 1,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      },
+      "position": {
+        "rows": 15,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 14,
+          "mean": 631545428.5714285,
+          "p50": 186266000,
+          "p95": 1624055000,
+          "p99": 1624055000,
+          "max": 3820079000
+        }
+      },
+      "intervals": {
+        "rows": 1423,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 1422,
+          "mean": 3722983.8255977496,
+          "p50": 3672000,
+          "p95": 6439000,
+          "p99": 8566000,
+          "max": 31127000
+        }
+      },
+      "stints": {
+        "rows": 2,
+        "outOfOrder": 0,
+        "duplicates": 0,
+        "untimed": 2,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      },
+      "race_control": {
+        "rows": 49,
+        "outOfOrder": 1,
+        "duplicates": 0,
+        "untimed": 0,
+        "outsideWindow": 0,
+        "intervalsUS": {
+          "count": 48,
+          "mean": 182000000,
+          "p50": 48000000,
+          "p95": 699000000,
+          "p99": 925000000,
+          "max": 1267000000
+        }
+      }
+    }
+  }
+]
