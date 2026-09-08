@@ -1,7 +1,9 @@
 /** Import of external open circuit geometry (TUMFTM racetrack-database CSV, bacinger/f1-circuits GeoJSON)
  *  and its alignment into a session's experimental local meter frame. Everything here is pure:
  *  no network, no filesystem — the CLI in scripts/import-geometry.ts does IO. */
-import { distance, wrap, type Point } from "./geometry";
+import { wrap, type Point } from "./geometry";
+
+const distance = (a: {x: number; y: number}, b: {x: number; y: number}) => Math.hypot(a.x - b.x, a.y - b.y);
 
 export interface CenterlinePoint { x: number; y: number; wr: number; wl: number }
 export interface SimilarityTransform { scale: number; cos: number; sin: number; tx: number; ty: number }
@@ -26,7 +28,7 @@ export function parseTumftmCsv(text: string): CenterlinePoint[] {
     if (wr <= 0 || wl <= 0) throw new Error(`TUMFTM CSV line ${lineNumber + 1}: non-positive width`);
     points.push({x, y, wr, wl});
   }
-  if (points.length < 8) throw new Error("TUMFTM CSV: too few centerline points");
+  if (points.length < 3) throw new Error("TUMFTM CSV: too few centerline points");
   return points;
 }
 
@@ -38,7 +40,7 @@ export function parseCircuitGeojson(text: string, defaultWidthM: number): {name:
   const feature = (doc.features ?? []).find((f: any) => f?.geometry?.type === "LineString");
   if (!feature) throw new Error("GeoJSON: no LineString feature found");
   const coordinates: number[][] = feature.geometry.coordinates;
-  if (!Array.isArray(coordinates) || coordinates.length < 8 || !coordinates.every(c => Array.isArray(c) && c.length >= 2 && c.every(finite)))
+  if (!Array.isArray(coordinates) || coordinates.length < 3 || !coordinates.every(c => Array.isArray(c) && c.length >= 2 && c.every(finite)))
     throw new Error("GeoJSON: invalid LineString coordinates");
   const meanLat = coordinates.reduce((a, c) => a + c[1], 0) / coordinates.length;
   const meanLon = coordinates.reduce((a, c) => a + c[0], 0) / coordinates.length;
@@ -118,7 +120,35 @@ export function alignClosedLoops(reference: CenterlinePoint[], target: {x: numbe
       }
     }
   }
-  return best!;
+  // ICP refinement: point-to-polyline correspondence removes phase quantization and arc-length mismatch.
+  const ref = best!.reference;
+  let transform = best!.transform, rms = best!.rms;
+  for (let iteration = 0; iteration < 5; iteration++) {
+    const mapped = ref.map(p => applyTransform(p, transform));
+    const correspondence = mapped.map(m => {
+      let bestPoint = q[0], d = Infinity;
+      for (let s = 0; s < samples; s++) {
+        const a = q[s], b = q[(s + 1) % samples], dx = b.x - a.x, dy = b.y - a.y;
+        const f = Math.max(0, Math.min(1, ((m.x - a.x) * dx + (m.y - a.y) * dy) / (dx * dx + dy * dy || 1)));
+        const point = {x: a.x + dx * f, y: a.y + dy * f}, h = distance(m, point);
+        if (h < d) {d = h; bestPoint = point;}
+      }
+      return bestPoint;
+    });
+    const fit = fitSimilarity(mapped, correspondence);
+    if (fit.rms >= rms - 1e-6) break;
+    transform = compose(fit.transform, transform);
+    rms = fit.rms;
+  }
+  return {...best!, transform, rms};
+}
+
+/** Similarity composition: apply b, then a. */
+export function compose(a: SimilarityTransform, b: SimilarityTransform): SimilarityTransform {
+  return {scale: a.scale * b.scale,
+    cos: a.cos * b.cos - a.sin * b.sin, sin: a.sin * b.cos + a.cos * b.sin,
+    tx: a.scale * (a.cos * b.tx - a.sin * b.ty) + a.tx,
+    ty: a.scale * (a.sin * b.tx + a.cos * b.ty) + a.ty};
 }
 
 /** Curvature (1/m) of a uniformly resampled closed loop, lightly smoothed. Positive = turning left. */

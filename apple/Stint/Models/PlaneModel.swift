@@ -15,7 +15,15 @@ enum PlaneModel {
             let mesh = MDLAsset(url: url).childObjects(of: MDLMesh.self).first as? MDLMesh
             if let mesh {
                 mesh.addNormals(withAttributeNamed: MDLVertexAttributeNormal, creaseThreshold: 0.5)
-                return SCNNode(geometry: SCNGeometry(mdlMesh: mesh))
+                let geometry = SCNGeometry(mdlMesh: mesh)
+                // The mesh ships without materials: a white executive-jet finish.
+                let paint = SCNMaterial()
+                paint.lightingModel = .physicallyBased
+                paint.diffuse.contents = PlatformColor(white: 0.93, alpha: 1)
+                paint.metalness.contents = NSNumber(value: 0.5)
+                paint.roughness.contents = NSNumber(value: 0.35)
+                geometry.materials = [paint]
+                return SCNNode(geometry: geometry)
             }
         }
         return nil

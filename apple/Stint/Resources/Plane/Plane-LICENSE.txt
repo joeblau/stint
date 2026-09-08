@@ -1,0 +1,11 @@
+Model Information:
+* title:	Gulfstream G650ER
+* source:	https://sketchfab.com/3d-models/gulfstream-g650er-b88fa0194c2b49ef8560337ab96d7579
+* author:	Luca Martina (https://sketchfab.com/LucaMartina)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gulfstream G650ER" (https://sketchfab.com/3d-models/gulfstream-g650er-b88fa0194c2b49ef8560337ab96d7579) by Luca Martina (https://sketchfab.com/LucaMartina) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
