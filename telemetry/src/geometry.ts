@@ -1,4 +1,4 @@
-export interface Point { x: number; y: number; z: number; /** Right/left track half-widths in meters, when sourced from measured geometry. */ wr?: number; wl?: number }
+export interface Point { x: number; y: number; z: number; /** Right/left track half-widths in meters, when sourced from measured geometry. */ wr?: number; wl?: number; /** WGS84 coordinates, when the geometry carries a geographic transform. */ lat?: number; lon?: number }
 export interface RouteDefinition {
   id: string; kind: "track" | "pit"; closed: boolean; points: Point[];
   /** Track distances at the endpoints of an open pit route, if surveyed/verified. */
@@ -7,6 +7,15 @@ export interface RouteDefinition {
 export interface GeometryDefinition {
   version: 1; sessionKey: number; metersPerUnit: number;
   provenance: string; confidence: number; verified: boolean;
+  routes: RouteDefinition[];
+}
+/** Standalone per-circuit geometry (2026 track library), not keyed to any session. Local meter frame is the
+ *  equirectangular projection of the geo-referenced reference loop about `projection`; points also carry WGS84. */
+export interface CircuitGeometryDefinition {
+  version: 1; circuit: string; name: string; country: string; metersPerUnit: number;
+  provenance: string; confidence: number; verified: boolean;
+  /** Equirectangular projection origin (degrees) relating local meters to WGS84. */
+  projection: { lat0: number; lon0: number };
   routes: RouteDefinition[];
 }
 export interface Projection { distance: number; residual: number; point: Point; heading: number; segment: number }

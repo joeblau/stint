@@ -104,7 +104,13 @@ final class RaceSession {
     }
 
     func install(_ replay: RaceReplay, source: String) {
-        self.replay = replay
+        // Build once when opening downloaded data, including previously saved replays.
+        // Telemetry and timing still use the original samples and timestamps.
+        self.replay = source == "OPENF1"
+            ? RaceReplay(version: replay.version, title: replay.title, circuit: replay.circuit,
+                         recordings: replay.recordings.map { $0.preparingMotion() },
+                         totalLaps: replay.totalLaps, startDate: replay.startDate)
+            : replay
         lighting = .raceTime
         sourceName = source
         demoCircuit = nil

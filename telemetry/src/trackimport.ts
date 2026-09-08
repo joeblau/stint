@@ -32,9 +32,18 @@ export function parseTumftmCsv(text: string): CenterlinePoint[] {
   return points;
 }
 
+/** Equirectangular projection origin (mean latitude/longitude of the source coordinates). */
+export interface GeoOrigin { lat0: number; lon0: number }
+const METERS_PER_DEGREE = Math.PI * 6378137 / 180;
+export const projectLonLat = (lon: number, lat: number, origin: GeoOrigin): {x: number; y: number} =>
+  ({x: (lon - origin.lon0) * Math.cos(origin.lat0 * Math.PI / 180) * METERS_PER_DEGREE, y: (lat - origin.lat0) * METERS_PER_DEGREE});
+export const unprojectToLonLat = (x: number, y: number, origin: GeoOrigin): {lat: number; lon: number} =>
+  ({lat: y / METERS_PER_DEGREE + origin.lat0, lon: x / (Math.cos(origin.lat0 * Math.PI / 180) * METERS_PER_DEGREE) + origin.lon0});
+
 /** bacinger/f1-circuits GeoJSON: a LineString of [lon, lat]; projected equirectangularly about the mean latitude.
- *  No measured widths exist there, so a constant total width is split evenly left/right. */
-export function parseCircuitGeojson(text: string, defaultWidthM: number): {name: string; lengthM?: number; points: CenterlinePoint[]} {
+ *  No measured widths exist there, so a constant total width is split evenly left/right.
+ *  The projection origin is returned so local-meter points can be mapped back to WGS84 via unprojectToLonLat. */
+export function parseCircuitGeojson(text: string, defaultWidthM: number): {name: string; lengthM?: number; origin: GeoOrigin; points: CenterlinePoint[]} {
   if (!(defaultWidthM >= 4 && defaultWidthM <= 30)) throw new Error("default width must be within 4..30 m");
   const doc = JSON.parse(text);
   const feature = (doc.features ?? []).find((f: any) => f?.geometry?.type === "LineString");
@@ -42,12 +51,11 @@ export function parseCircuitGeojson(text: string, defaultWidthM: number): {name:
   const coordinates: number[][] = feature.geometry.coordinates;
   if (!Array.isArray(coordinates) || coordinates.length < 3 || !coordinates.every(c => Array.isArray(c) && c.length >= 2 && c.every(finite)))
     throw new Error("GeoJSON: invalid LineString coordinates");
-  const meanLat = coordinates.reduce((a, c) => a + c[1], 0) / coordinates.length;
-  const meanLon = coordinates.reduce((a, c) => a + c[0], 0) / coordinates.length;
-  const metersPerDegree = Math.PI * 6378137 / 180, cosLat = Math.cos(meanLat * Math.PI / 180);
+  const origin: GeoOrigin = {lat0: coordinates.reduce((a, c) => a + c[1], 0) / coordinates.length,
+    lon0: coordinates.reduce((a, c) => a + c[0], 0) / coordinates.length};
   const half = defaultWidthM / 2;
-  const points = coordinates.map(([lon, lat]) => ({x: (lon - meanLon) * cosLat * metersPerDegree, y: (lat - meanLat) * metersPerDegree, wr: half, wl: half}));
-  return {name: feature.properties?.Name ?? "unknown", lengthM: feature.properties?.length, points};
+  const points = coordinates.map(([lon, lat]) => ({...projectLonLat(lon, lat, origin), wr: half, wl: half}));
+  return {name: feature.properties?.Name ?? "unknown", lengthM: feature.properties?.length, origin, points};
 }
 
 /** Uniform arc-length resampling of a closed loop. Extra numeric fields (wr, wl, z) are linearly interpolated. */
@@ -72,6 +80,20 @@ export function resampleClosed<T extends {x: number; y: number}>(points: T[], n:
 
 export const applyTransform = <T extends {x: number; y: number}>(p: T, t: SimilarityTransform): T =>
   ({...p, x: t.scale * (t.cos * p.x - t.sin * p.y) + t.tx, y: t.scale * (t.sin * p.x + t.cos * p.y) + t.ty});
+
+/** Insert linearly interpolated points (widths included) so no segment of a closed loop exceeds maxStep meters. */
+export function densifyClosed(points: CenterlinePoint[], maxStep = 25): CenterlinePoint[] {
+  const dense: CenterlinePoint[] = [];
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i], b = points[(i + 1) % points.length];
+    dense.push(a);
+    const span = Math.hypot(b.x - a.x, b.y - a.y), parts = Math.ceil(span / maxStep);
+    for (let k = 1; k < parts; k++)
+      dense.push({x: a.x + (b.x - a.x) * k / parts, y: a.y + (b.y - a.y) * k / parts,
+        wr: a.wr + (b.wr - a.wr) * k / parts, wl: a.wl + (b.wl - a.wl) * k / parts});
+  }
+  return dense;
+}
 
 /** Optimal similarity fit (no reflection) mapping source onto target, index-corresponded. */
 export function fitSimilarity(source: {x: number; y: number}[], target: {x: number; y: number}[]): {transform: SimilarityTransform; rms: number} {

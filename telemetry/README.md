@@ -28,6 +28,16 @@ bun telemetry/scripts/baseline-legacy.ts
 
 Repeat with `11299` (Monaco) or `11253` (Suzuka). The checked-in fixtures run offline. `scripts/fixtures.ts` regenerates extracted test subsets from downloaded archives; it does not claim those subsets are byte-exact API responses.
 
+External reference geometry can be imported and aligned into a session's experimental local frame:
+
+```sh
+bun telemetry/scripts/import-geometry.ts 11253 --tumftm Suzuka --kerbs
+bun telemetry/scripts/import-geometry.ts 11361 --tumftm Monza --kerbs
+bun telemetry/scripts/import-geometry.ts 11299 --geojson mc-1929 --default-width 11 --kerbs --max-rms 40
+```
+
+`import-geometry.ts` downloads an open centerline ([TUMFTM racetrack-database](https://github.com/TUMFTM/racetrack-database) with per-point left/right widths, or [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) WGS84 GeoJSON projected equirectangularly), caches the exact source under `geometry/reference/` and records its SHA-256 in provenance. A similarity transform (scale/rotation/translation, best phase and direction by cross-correlation, then ICP refinement) aligns the centerline onto the session's experimental geometry; a fit worse than 15 m RMS is refused unless explicitly overridden with `--max-rms`. Output is `<sessionKey>.tumftm.json`/`.bacinger.json`: `verified: false`, confidence capped at 0.8 and reduced by fit RMS, never overwriting `.experimental.json` (re-runs need `--force`). TUMFTM widths are satellite-derived; the GeoJSON path has no measured widths and uses a constant default. There is still no WGS84 transform and z is copied from the nearest experimental point. `--kerbs` writes a separate synthetic `<sessionKey>.kerbs.json` (curvature-derived 2 m strips at corner apexes and exits), not measured geometry and not part of the version-1 format. Suzuka/Monza align at ~2 m RMS, but the Monaco experimental lap is geometrically distorted (~2.5 km vs the 3.3 km circuit), so its fit reaches ~36 m RMS at confidence 0.3 — it needs the explicit override and should be treated as approximate.
+
 Run only one ingestion process per IP at a time. The client spaces requests by 2.1 seconds for OpenF1's public 30/minute tier, retries throttling/server/network failures with bounded backoff and preserves resumable progress. A per-session lock prevents competing manifest writers. A stale lock after a forced process kill must be removed only after checking its PID is no longer running. Responses exceeding 100 MB fail explicitly; split requests into smaller time windows rather than raising memory limits. Automatic window subdivision and distributed rate limiting are not implemented.
 
 ## Archive and timeline
