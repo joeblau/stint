@@ -1,0 +1,150 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 96px 24px 64px;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(225, 6, 0, 0.16), transparent),
+    var(--track-black);
+}
+
+.icon {
+  border-radius: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 0 48px rgba(225, 6, 0, 0.18);
+}
+
+.title {
+  line-height: 0;
+}
+
+.wordmark {
+  width: min(520px, 82vw);
+  height: auto;
+}
+
+/* The brand's slanted speed bar, cut at the wordmark's italic angle. */
+.speedBar {
+  display: block;
+  width: min(520px, 82vw);
+  height: 8px;
+  margin-top: 28px;
+  background: var(--accent);
+  clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+}
+
+.tagline {
+  margin-top: 28px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--pit-gray);
+}
+
+.sub {
+  margin-top: 20px;
+  max-width: 560px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.actions {
+  margin-top: 36px;
+  display: flex;
+  gap: 12px;
+}
+
+.primary,
+.secondary {
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.secondary {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.featuresSection {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+  width: 100%;
+}
+
+.kicker {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--pit-gray);
+}
+
+.featuresTitle {
+  margin-top: 12px;
+  margin-bottom: 24px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.featuresTitle::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 3px;
+  margin-top: 16px;
+  background: var(--accent);
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.footer {
+  padding: 32px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}

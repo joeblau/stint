@@ -6,3 +6,8 @@ DerivedData/
 *.xcodeproj/
 *.xcworkspace/
 xcuserdata/
+.turbo/
+node_modules/
+.next/
+.open-next/
+.wrangler/
