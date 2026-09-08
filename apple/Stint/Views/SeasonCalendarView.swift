@@ -11,6 +11,7 @@ struct SeasonCalendarView: View {
     @State private var selected: Int?
     @State private var month = Season2026.nextRace(at: Date())?.startMonth ?? 12
     @State private var overviewRequest = UUID()
+    @State private var flyoverRequest = UUID()
 
     private var selection: SeasonRace? { Season2026.races.first { $0.id == selected } }
 
@@ -19,7 +20,7 @@ struct SeasonCalendarView: View {
             GeometryReader { geometry in
                 let compact = geometry.size.width < 800
                 ZStack {
-                    SeasonGlobeView(active: active, flight: flight, onFlightComplete: onFlightComplete, selected: selected, overviewRequest: overviewRequest, now: timeline.date) { race in
+                    SeasonGlobeView(active: active, flight: flight, onFlightComplete: onFlightComplete, selected: selected, overviewRequest: overviewRequest, flyoverRequest: flyoverRequest, now: timeline.date) { race in
                         select(race)
                     }
                     .ignoresSafeArea()
@@ -250,6 +251,14 @@ struct SeasonCalendarView: View {
                     .accessibilityLabel("Flight from \(previous.cityName): \(Int(leg.distanceKm.rounded())) kilometers, \(leg.durationLabel)")
                     .accessibilityIdentifier("calendar-flight-leg")
             }
+            Button { flyoverRequest = UUID() } label: {
+                Label("Fly over circuit", systemImage: "video")
+                    .font(.system(size: 11, weight: .medium)).foregroundStyle(.secondary)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("flyover-circuit")
+            .help("Settle above the track, chase one lap, then pull back")
             Button { onOpenRace(race.circuit) } label: {
                 HStack {
                     Text(library.isSaved(race) ? "Play saved replay" : "Open race")

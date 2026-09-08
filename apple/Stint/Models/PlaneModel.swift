@@ -37,7 +37,10 @@ enum PlaneModel {
         if let template {
             let jet = template.clone()
             normalize(jet)
-            return jet
+            // Flight pose/scale belongs to a wrapper so it cannot overwrite asset normalization.
+            let root = SCNNode()
+            root.addChildNode(jet)
+            return root
         }
         return procedural()
     }
@@ -48,6 +51,8 @@ enum PlaneModel {
         guard length > 0 else { return }
         let scale = 30 / Float(length)
         node.scale = SCNVector3(scale, scale, scale)
+        let center = SIMD3<Float>(Float(min.x + max.x), Float(min.y + max.y), Float(min.z + max.z)) / 2
+        node.simdPosition = -center * scale
     }
 
     private static func procedural() -> SCNNode {

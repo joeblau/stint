@@ -9,16 +9,17 @@ struct SeasonGlobeView: PlatformRepresentable {
     let onFlightComplete: () -> Void
     let selected: Int?
     let overviewRequest: UUID
+    var flyoverRequest = UUID()
     let now: Date
     let onSelect: (SeasonRace) -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     #if os(macOS)
     func makeNSView(context: Context) -> SeasonGlobeSurface { SeasonGlobeSurface(onSelect: onSelect) }
-    func updateNSView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, onComplete: onFlightComplete) }
+    func updateNSView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, onComplete: onFlightComplete) }
     #else
     func makeUIView(context: Context) -> SeasonGlobeSurface { SeasonGlobeSurface(onSelect: onSelect) }
-    func updateUIView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, onComplete: onFlightComplete) }
+    func updateUIView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, onComplete: onFlightComplete) }
     #endif
 }
 
@@ -33,6 +34,9 @@ private typealias VenueButton = UIButton
 final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     let map = MKMapView()
     private let routesLayer = CALayer()
+    private let flownTrailLayer = CAShapeLayer()
+    var projectedTrailEnd: CGPoint? { flownTrailLayer.path?.isEmpty == false ? flownTrailLayer.path?.currentPoint : nil }
+    private(set) var projectedJetPosition: CGPoint?
     private var routes: [(points: [GlobeVertex], layer: CAShapeLayer, destination: SeasonRace)] = []
     private var markerButtons: [VenueButton] = []
     private var cityLabels: [CATextLayer] = []
@@ -55,11 +59,23 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     private let scene = SCNScene()
     private let sceneCamera = SCNNode()
     private var planeNode: SCNNode?
-    private(set) var planeFlight: (itinerary: GlobeItinerary, began: TimeInterval)?
+    struct PlaneFlight {
+        let itinerary: GlobeItinerary
+        let began: TimeInterval
+        let departureCamera: MKMapCamera
+        let cameraDistance: Double
+        let departureDuration: Double
+    }
+    private(set) var planeFlight: PlaneFlight?
+    private(set) var planePosition: GlobeItinerary.Position?
     /// The last trip flown, kept highlighted on the route lines until the next selection.
     private var flownItinerary: GlobeItinerary?
     private var reduceMotion = false
-    private static let flightCameraDistance = 5_000_000.0
+    /// The cinematic pass over the selected circuit, started by a second click on its pin.
+    private var flyover: (pass: TrackFlyover, began: TimeInterval, start: MKMapCamera)?
+    private var lastFlyoverRequest: UUID?
+    var isFlyingOver: Bool { flyover != nil }
+
 
 
     init(onSelect: @escaping (SeasonRace) -> Void) {
@@ -83,15 +99,24 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         sceneView.backgroundColor = .clear
         sceneView.antialiasingMode = .multisampling4X
         sceneView.rendersContinuously = false
+        sceneView.preferredFramesPerSecond = 60
         sceneView.isPlaying = true
+        sceneView.isHidden = true
         #if os(macOS)
         sceneView.wantsLayer = true
         sceneView.layer?.isOpaque = false
         sceneView.layer?.zPosition = 3
+        sceneView.setAccessibilityElement(true)
+        sceneView.setAccessibilityRole(.image)
+        sceneView.setAccessibilityLabel("Gulfstream G650 in flight")
+        sceneView.setAccessibilityIdentifier("calendar-jet")
         #else
         sceneView.isOpaque = false
         sceneView.isUserInteractionEnabled = false
         sceneView.layer.zPosition = 3
+        sceneView.isAccessibilityElement = true
+        sceneView.accessibilityLabel = "Gulfstream G650 in flight"
+        sceneView.accessibilityIdentifier = "calendar-jet"
         #endif
         addSubview(sceneView)
         let lens = SCNCamera()
@@ -120,10 +145,7 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         #endif
         routesLayer.zPosition = 1
         for (a, b) in zip(Season2026.races, Season2026.races.dropFirst()) {
-            var coordinates = [a.point.coordinate, b.point.coordinate]
-            let geodesic = MKGeodesicPolyline(coordinates: &coordinates, count: 2)
-            var points = [CLLocationCoordinate2D](repeating: .init(), count: geodesic.pointCount)
-            geodesic.getCoordinates(&points, range: NSRange(location: 0, length: points.count))
+            let points = GlobeFlight(from: a.point.coordinate, to: b.point.coordinate).coordinates()
             let shape = CAShapeLayer()
             shape.fillColor = nil
             shape.lineWidth = 1.6
@@ -131,16 +153,22 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
             routesLayer.addSublayer(shape)
             routes.append((points.map(GlobeVertex.init), shape, b))
         }
+        flownTrailLayer.fillColor = nil
+        flownTrailLayer.strokeColor = PlatformColor(hex: StintPalette.redHex).withAlphaComponent(0.95).cgColor
+        flownTrailLayer.lineWidth = 2.4
+        flownTrailLayer.lineCap = .round
+        flownTrailLayer.lineJoin = .round
+        routesLayer.addSublayer(flownTrailLayer)
         for index in Season2026.races.indices {
             #if os(macOS)
-            let button = NSButton(title: "", target: self, action: #selector(selectVenue(_:)))
+            let button = NSButton(title: "", target: self, action: #selector(handleVenueButton(_:)))
             button.isBordered = false
             button.wantsLayer = true
             button.layer?.cornerRadius = 14
             button.layer?.zPosition = 2
             #else
             let button = UIButton(type: .custom)
-            button.addTarget(self, action: #selector(selectVenue(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(handleVenueButton(_:)), for: .touchUpInside)
             button.titleLabel?.font = .systemFont(ofSize: 11, weight: .bold)
             button.layer.cornerRadius = 14
             button.layer.zPosition = 2
@@ -167,12 +195,13 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
             startDisplayClock()
         } else {
             displayClock.stop()
+            cancelPlaneFlight()
         }
     }
 
     private func startDisplayClock() {
         guard active else { return }
-        displayClock.start(in: self) { [weak self] _ in self?.displayFrame() }
+        displayClock.start(in: self) { [weak self] now in self?.displayFrame(at: now) }
     }
 
     #if os(macOS)
@@ -187,9 +216,16 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     }
     #endif
 
-    private func displayFrame() {
+    func displayFrame(at now: TimeInterval) {
+        guard active else { return }
+        if let flyover {
+            let elapsed = now - flyover.began
+            map.setCamera(flyover.pass.camera(at: elapsed, from: flyover.start), animated: false)
+            needsRedraw = true
+            if elapsed >= flyover.pass.duration { cancelFlyover() }
+        }
         if let flight = currentFlight {
-            let progress = min(1, (ProcessInfo.processInfo.systemUptime - flight.began) / max(0.001, flight.request.duration))
+            let progress = min(1, (now - flight.began) / max(0.001, flight.request.duration))
             let camera = MapFlight.camera(from: flight.start, to: flight.request.destination, progress: progress)
             applyStyle(satellite: flight.request.satellite, day: flight.request.day,
                        globe: camera.centerCoordinateDistance > 2_000_000)
@@ -201,32 +237,41 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
             }
         }
         if let plane = planeFlight {
-            let elapsed = ProcessInfo.processInfo.systemUptime - plane.began
-            if elapsed >= plane.itinerary.durationSeconds || plane.itinerary.isEmpty {
-                landPlane(at: plane.itinerary.legs.last?.to)
-            } else if let position = plane.itinerary.position(at: elapsed) {
-                // The camera rides along; the map scrolls under the jet at one second per flight hour.
-                map.setCamera(MKMapCamera(lookingAtCenter: position.coordinate, fromDistance: Self.flightCameraDistance,
+            applyStyle(satellite: true, day: false, globe: plane.cameraDistance > 2_000_000)
+            let elapsed = max(0, now - plane.began)
+            let travelTime = max(0, elapsed - plane.departureDuration)
+            if elapsed < plane.departureDuration, let departure = plane.itinerary.legs.first?.from {
+                let target = MKMapCamera(lookingAtCenter: departure, fromDistance: plane.cameraDistance, pitch: 0, heading: 0)
+                map.setCamera(MapFlight.camera(from: plane.departureCamera, to: target,
+                                               progress: elapsed / plane.departureDuration), animated: false)
+                needsRedraw = true
+            } else if let position = plane.itinerary.position(at: travelTime) {
+                // One distance/time sample controls both plane and camera. No independent camera tween.
+                map.setCamera(MKMapCamera(lookingAtCenter: position.coordinate, fromDistance: plane.cameraDistance,
                                           pitch: 0, heading: 0), animated: false)
+                planePosition = position
                 positionPlane(position)
                 needsRedraw = true
+                if travelTime >= plane.itinerary.durationSeconds { landPlane() }
             }
         }
         if needsRedraw { needsRedraw = false; drawRoutes() }
     }
 
-    /// Flies the jet from one round to another along the calendar's route lines, leg by leg.
-    /// Returns false when no flight starts (Reduce Motion, or the venues are too close).
+    /// Only neighboring schedule entries get a jet flight, in either direction.
     @discardableResult
     private func startPlaneFlight(from origin: SeasonRace, to destination: SeasonRace) -> Bool {
+        guard let start = Season2026.races.firstIndex(where: { $0.id == origin.id }),
+              let end = Season2026.races.firstIndex(where: { $0.id == destination.id }),
+              abs(start - end) == 1 else { return false }
         guard !reduceMotion || ProcessInfo.processInfo.environment["STINT_FORCE_FLIGHT"] == "1" else { return false }
         var itinerary = GlobeItinerary.alongCalendar(from: origin, to: destination)
-        if let active = planeFlight, let position = active.itinerary.position(at: ProcessInfo.processInfo.systemUptime - active.began) {
+        let redirected = planeFlight != nil && planePosition != nil
+        if let position = planePosition, redirected {
             // Redirect mid-air: the new trip departs from where the jet is now.
             itinerary = .direct(from: position.coordinate, to: destination.point.coordinate)
         }
-        guard itinerary.distanceKm > 50 else { return false }
-        planeFlight = (itinerary, ProcessInfo.processInfo.systemUptime)
+        guard itinerary.distanceKm > 0.001 else { return false }
         flownItinerary = itinerary
         if planeNode == nil {
             let node = PlaneModel.make()
@@ -236,45 +281,62 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         }
         planeNode?.removeAllActions()
         planeNode?.opacity = 1
+        // Asset loading must not consume the flight clock, particularly on short routes.
+        let camera = map.camera.copy() as! MKMapCamera
+        let distance = redirected ? camera.centerCoordinateDistance
+            : min(5_000_000, max(600_000, (itinerary.legs.first?.distanceKm ?? 0) * 2_000))
+        planeFlight = PlaneFlight(itinerary: itinerary, began: ProcessInfo.processInfo.systemUptime,
+                                  departureCamera: camera, cameraDistance: distance,
+                                  departureDuration: redirected ? 0 : 0.8)
+        if !redirected { planePosition = nil; sceneView.isHidden = true }
+        sceneView.rendersContinuously = true
+        startDisplayClock()
         return true
     }
 
-    private func landPlane(at destination: CLLocationCoordinate2D?) {
+    private func landPlane() {
         planeFlight = nil
-        if let node = planeNode {
-            node.runAction(.fadeOut(duration: 0.6)) { node.isHidden = true }
-        }
-        if let destination {
-            map.setCamera(MKMapCamera(lookingAtCenter: destination, fromDistance: 4_000_000, pitch: 0, heading: 0), animated: true)
-        }
+        planeNode?.isHidden = true
+        sceneView.isHidden = true
+        sceneView.rendersContinuously = false
         needsRedraw = true
+    }
+
+    private func cancelPlaneFlight() {
+        landPlane()
+        planePosition = nil
+        flownItinerary = nil
+        projectedJetPosition = nil
+        flownTrailLayer.path = nil
     }
 
     private func positionPlane(_ position: GlobeItinerary.Position) {
         guard let node = planeNode, bounds.width > 0, bounds.height > 0 else { return }
         projection = GlobeProjection.Camera(center: map.camera.centerCoordinate,
                                             distance: map.camera.centerCoordinateDistance, size: bounds.size)
-        guard let point = projectOnScreen(position.coordinate), let ahead = projectOnScreen(position.ahead) else {
+        guard let point = projectOnScreen(position.coordinate) else {
+            projectedJetPosition = nil
             node.isHidden = true
             return
         }
-        let dx = ahead.x - point.x
-        let dy = ahead.y - point.y
-        guard hypot(dx, dy) > 0.0001 else { node.isHidden = true; return }
+        projectedJetPosition = point
         let altitude = position.altitude
-        let climb = Float(cos(position.legProgress * .pi) * 0.35) // nose up on climb, down on descent
+        let climb = Float(cos(position.legProgress * .pi) * 0.18)
+        SCNTransaction.begin()
+        SCNTransaction.disableActions = true
+        SCNTransaction.animationDuration = 0
+        sceneView.isHidden = false
         node.isHidden = false
         node.opacity = max(0, min(1, min(position.progress / 0.05, (1 - position.progress) / 0.08)))
         node.simdPosition = SIMD3(Float(point.x), Float(bounds.height - point.y), Float(60 + altitude * 26))
-        // Nose along the track, top toward the camera, so the jet is seen from above.
-        let back = -simd_normalize(SIMD3(Float(dx), -Float(dy), climb))
-        let right = simd_normalize(simd_cross(SIMD3<Float>(0, 0, 1), back))
-        let up = simd_cross(back, right)
-        node.simdOrientation = simd_quatf(simd_float3x3(columns: (right, up, back)))
+        // Nose follows the north-up map bearing; show the top with a little pitch for depth.
+        node.simdOrientation = simd_quatf(angle: -Float(position.heading * .pi / 180), axis: SIMD3(0, 0, 1))
+            * simd_quatf(angle: .pi / 2 - 0.25 - climb, axis: SIMD3(1, 0, 0))
         // About 60 points long at cruise so the jet reads at globe scale.
         node.simdScale = SIMD3(repeating: Float(1.6 + altitude * 0.6))
         sceneCamera.simdPosition = SIMD3(Float(bounds.width / 2), Float(bounds.height / 2), 2_000)
         sceneCamera.camera?.orthographicScale = Double(bounds.height / 2)
+        SCNTransaction.commit()
         #if os(macOS)
         sceneView.needsDisplay = true
         #else
@@ -325,13 +387,25 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         needsRedraw = true
     }
 
-    func update(selected: Int?, overview: UUID, now: Date, active: Bool, flight: MapFlight?, reduceMotion: Bool, onComplete: @escaping () -> Void) {
+    func update(selected: Int?, overview: UUID, now: Date, active: Bool, flight: MapFlight?, reduceMotion: Bool,
+                flyover flyoverRequest: UUID? = nil, onComplete: @escaping () -> Void) {
         setActive(active)
         onFlightComplete = onComplete
         self.reduceMotion = reduceMotion
+        // The card's "Fly over circuit" button changes this token; the first value seen is the baseline.
+        if let flyoverRequest {
+            if lastFlyoverRequest == nil {
+                lastFlyoverRequest = flyoverRequest
+            } else if lastFlyoverRequest != flyoverRequest {
+                lastFlyoverRequest = flyoverRequest
+                if currentFlight == nil, let race = Season2026.races.first(where: { $0.id == selected }) { startFlyover(race) }
+            }
+        }
         if !Calendar.current.isDate(self.now, inSameDayAs: now) { needsRedraw = true }
         self.now = now
         if let flight, lastFlightID != flight.id {
+            cancelPlaneFlight()
+            cancelFlyover()
             lastFlightID = flight.id
             let start = flight.start ?? map.camera.copy() as! MKMapCamera
             // Match the race map's style before the first frame so the swap reads as one camera move.
@@ -342,45 +416,103 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         }
         if lastOverview != overview {
             lastOverview = overview
-            map.setCamera(MKMapCamera(lookingAtCenter: .init(latitude: 20, longitude: 15),
+            cancelPlaneFlight()
+            cancelFlyover()
+            if currentFlight == nil { map.setCamera(MKMapCamera(lookingAtCenter: .init(latitude: 20, longitude: 15),
                                      fromDistance: 40_000_000, pitch: 0, heading: 0), animated: false)
+            }
         }
         if currentFlight == nil, self.selected != selected {
-            let previous = self.selected
-            self.selected = selected
-            needsRedraw = true
-            if let race = Season2026.races.first(where: { $0.id == selected }) {
-                var flying = false
-                if let previous, let origin = Season2026.races.first(where: { $0.id == previous }) {
-                    flying = startPlaneFlight(from: origin, to: race)
-                } else {
-                    flownItinerary = nil
-                }
-                if !flying {
-                    map.setCamera(MKMapCamera(lookingAtCenter: race.point.coordinate,
-                                             fromDistance: 4_000_000, pitch: 0, heading: 0), animated: true)
-                }
-            } else {
-                planeFlight = nil
-                flownItinerary = nil
-                planeNode?.isHidden = true
+            selectRace(selected)
+        }
+        if reduceMotion, planeFlight != nil,
+           ProcessInfo.processInfo.environment["STINT_FORCE_FLIGHT"] != "1" {
+            let destination = planeFlight?.itinerary.legs.last?.to
+            cancelPlaneFlight()
+            if let destination {
+                map.setCamera(MKMapCamera(lookingAtCenter: destination, fromDistance: 4_000_000,
+                                         pitch: 0, heading: 0), animated: false)
             }
         }
     }
 
-    @objc private func selectVenue(_ sender: VenueButton) {
+    /// Schedule rows fly the jet from the previous selection; pins select directly.
+    private func selectRace(_ selected: Int?, byJet: Bool = true) {
+        let previous = self.selected
+        self.selected = selected
+        needsRedraw = true
+        cancelFlyover()
+        if let race = Season2026.races.first(where: { $0.id == selected }) {
+            var flying = false
+            if byJet, active, let previous, let origin = Season2026.races.first(where: { $0.id == previous }) {
+                flying = startPlaneFlight(from: origin, to: race)
+            } else {
+                flownItinerary = nil
+            }
+            if !flying {
+                cancelPlaneFlight()
+                map.setCamera(MKMapCamera(lookingAtCenter: race.point.coordinate,
+                                         fromDistance: byJet && previous != nil ? 6_000 : previous == nil ? 4_000_000 : 300_000,
+                                         pitch: 0, heading: 0), animated: !reduceMotion)
+            }
+        } else {
+            cancelPlaneFlight()
+        }
+    }
+
+    /// A pin click selects the venue without flying the jet; clicking the selected pin again
+    /// starts a cinematic pass over its circuit.
+    func selectVenue(_ race: SeasonRace) {
+        guard currentFlight == nil else { return }
+        if selected != race.id {
+            selectRace(race.id, byJet: false)
+        } else if planeFlight == nil {
+            startFlyover(race)
+        }
+        onSelect(race)
+        needsRedraw = true
+    }
+
+    /// Settle above the circuit, chase one lap along the centerline, then pull back.
+    func startFlyover(_ race: SeasonRace) {
+        guard let circuit = try? race.circuit.loadCircuit() else { return }
+        cancelPlaneFlight()
+        let pass = TrackFlyover(circuit: circuit)
+        if reduceMotion, ProcessInfo.processInfo.environment["STINT_FORCE_FLIGHT"] != "1" {
+            let overview = pass.overviewCamera
+            map.setCamera(MKMapCamera(lookingAtCenter: overview.centerCoordinate, fromDistance: overview.centerCoordinateDistance,
+                                      pitch: 0, heading: 0), animated: false)
+            needsRedraw = true
+            return
+        }
+        map.isPitchEnabled = true
+        flyover = (pass, ProcessInfo.processInfo.systemUptime, map.camera.copy() as! MKMapCamera)
+        setMapAccessibilityLabel("Flying over \(race.circuit.title)")
+        needsRedraw = true
+        startDisplayClock()
+    }
+
+    private func cancelFlyover() {
+        flyover = nil
+        setMapAccessibilityLabel(nil)
+    }
+
+    /// Announces the pass on the selected pin for assistive technology and UI tests while it runs.
+    private func setMapAccessibilityLabel(_ label: String?) {
+        for (index, group) in markerGroups.enumerated() where group.contains(where: { $0.id == selected }) {
+            #if os(macOS)
+            markerButtons[index].setAccessibilityValue(label)
+            #else
+            markerButtons[index].accessibilityValue = label
+            #endif
+        }
+    }
+
+    @objc private func handleVenueButton(_ sender: VenueButton) {
         guard currentFlight == nil, markerGroups.indices.contains(sender.tag) else { return }
         let races = markerGroups[sender.tag]
         if races.count == 1 {
-            let race = races[0]
-            // A pin is a direct request to inspect the circuit, including a second
-            // click on the current selection after panning or zooming away.
-            // Set this first so SwiftUI's selection update cannot zoom back out.
-            selected = race.id
-            onSelect(race)
-            map.setCamera(MKMapCamera(lookingAtCenter: race.point.coordinate,
-                                     fromDistance: 6_000, pitch: 0, heading: 0), animated: true)
-            needsRedraw = true
+            selectVenue(races[0])
         }
         else {
             let latitude = races.map(\.point.latitude).reduce(0, +) / Double(races.count)
@@ -487,31 +619,32 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         CATransaction.commit()
     }
 
-    /// Paints the jet's legs red along the calendar route: legs already flown in full, the
-    /// current leg up to the jet, and the rest untouched.
+    /// Project the flown geographic prefix, leaving the remaining route visible underneath.
     private func highlightFlownRoute() {
-        guard let itinerary = flownItinerary, itinerary.rounds.count >= 2 else { return }
-        let elapsed = planeFlight.map { ProcessInfo.processInfo.systemUptime - $0.began } ?? .infinity
-        let position = planeFlight?.itinerary.position(at: elapsed)
-        for (legIndex, pair) in zip(itinerary.rounds, itinerary.rounds.dropFirst()).enumerated() {
-            let (a, b) = pair
-            // Route lines are stored in calendar order: the line at index i joins rounds i+1 and i+2.
-            let routeIndex = min(a, b) - 1
-            guard routes.indices.contains(routeIndex) else { continue }
-            let fraction: CGFloat
+        guard let itinerary = flownItinerary else { flownTrailLayer.path = nil; return }
+        let position = planeFlight != nil ? (planePosition ?? itinerary.position(at: 0)) : nil
+        let path = CGMutablePath()
+        for (index, leg) in itinerary.legs.enumerated() {
+            let fraction: Double
             if let position {
-                fraction = legIndex < position.legIndex ? 1 : legIndex == position.legIndex ? CGFloat(position.legProgress) : 0
-            } else {
-                fraction = 1
-            }
+                fraction = index < position.legIndex ? 1 : index == position.legIndex ? position.legProgress : 0
+            } else { fraction = 1 }
             guard fraction > 0 else { continue }
-            let layer = routes[routeIndex].layer
-            layer.strokeColor = PlatformColor(hex: StintPalette.redHex).withAlphaComponent(0.95).cgColor
-            layer.lineDashPattern = nil
-            layer.lineWidth = 2.4
-            if b > a { layer.strokeStart = 0; layer.strokeEnd = fraction }
-            else { layer.strokeStart = 1 - fraction; layer.strokeEnd = 1 }
+            var coordinates = leg.coordinates(through: fraction)
+            if let position, index == position.legIndex {
+                coordinates[coordinates.count - 1] = position.coordinate
+            }
+            var previous: CGPoint?
+            for coordinate in coordinates {
+                // Use the jet's projection, including offscreen points until layer clipping.
+                guard let point = projectOnScreen(coordinate) else { previous = nil; continue }
+                if let previous, hypot(point.x - previous.x, point.y - previous.y) < bounds.width * 0.4 {
+                    path.addLine(to: point)
+                } else { path.move(to: point) }
+                previous = point
+            }
         }
+        flownTrailLayer.path = path
     }
 
     private func layoutCityLabels() {

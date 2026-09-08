@@ -5,10 +5,30 @@ import CoreLocation
 final class GlobeFlightTests: XCTestCase {
     private func race(_ id: String) -> SeasonRace { Season2026.races.first { $0.circuitID == id }! }
 
+    func testTrailFollowsTheFlightGeodesicThroughItsExactPosition() throws {
+        for (from, to) in [("melbourne", "shanghai"), ("shanghai", "melbourne"),
+                           ("suzuka", "miami"), ("montreal", "monaco")] {
+            let leg = GlobeFlight(from: race(from).point.coordinate, to: race(to).point.coordinate)
+            for progress in [0.1, 0.25, 0.5, 0.9, 1.0] {
+                let trail = leg.coordinates(through: progress)
+                let end = try XCTUnwrap(trail.last)
+                let jet = leg.coordinate(at: progress)
+                XCTAssertEqual(end.latitude, jet.latitude, accuracy: 0.0000001)
+                XCTAssertEqual(end.longitude, jet.longitude, accuracy: 0.0000001)
+                for point in trail {
+                    let a = GlobeFlight(from: leg.from, to: point).distanceKm
+                    let b = GlobeFlight(from: point, to: leg.to).distanceKm
+                    XCTAssertEqual(a + b, leg.distanceKm, accuracy: 0.01,
+                                   "Every trail vertex must remain on the same great circle as the jet")
+                }
+            }
+        }
+    }
+
     func testOneSecondPerFlightHourAtCruise() {
         let leg = GlobeFlight(from: race("monaco").point.coordinate, to: race("barcelona").point.coordinate)
         XCTAssertEqual(leg.distanceKm, 486, accuracy: 30)
-        XCTAssertEqual(leg.durationSeconds, leg.distanceKm / 900, accuracy: 0.0001)
+        XCTAssertEqual(leg.durationSeconds, 3, "Short hops must remain visible")
         let longHaul = GlobeFlight(from: race("melbourne").point.coordinate, to: race("shanghai").point.coordinate)
         XCTAssertEqual(longHaul.durationSeconds, longHaul.distanceKm / 900, accuracy: 0.0001)
         XCTAssertGreaterThan(longHaul.durationSeconds, 8)

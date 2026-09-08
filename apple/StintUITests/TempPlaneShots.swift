@@ -1,5 +1,6 @@
 import XCTest
 
+#if os(macOS)
 final class TempPlaneShots: XCTestCase {
     @MainActor func testPlaneFlightBetweenRaces() {
         let app = XCUIApplication()
@@ -24,3 +25,5 @@ final class TempPlaneShots: XCTestCase {
         XCTFail("Intentional: keep the flight recording.")
     }
 }
+
+#endif

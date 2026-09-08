@@ -3,7 +3,8 @@ import CoreLocation
 import simd
 
 /// One leg of the private jet's trip between two venues, time-compressed so that one second of
-/// animation is one real hour of flight at Gulfstream G650 cruise (about 900 km/h). The path is the
+/// animation is one real hour of flight at Gulfstream G650 cruise (about 900 km/h), with a
+/// three-second minimum for visible short hops. The path is the
 /// great circle on the unit sphere; altitude is a smooth climb, cruise, and descent.
 struct GlobeFlight {
     let from: CLLocationCoordinate2D
@@ -27,7 +28,7 @@ struct GlobeFlight {
 
     var distanceKm: Double { angleRadians * Self.earthRadiusKm }
     var hours: Double { distanceKm / Self.cruiseKPH }
-    var durationSeconds: Double { hours * Self.secondsPerHour }
+    var durationSeconds: Double { distanceKm < 0.001 ? 0 : max(3, hours * Self.secondsPerHour) }
 
     static func vector(_ coordinate: CLLocationCoordinate2D) -> SIMD3<Double> {
         let phi = coordinate.latitude * .pi / 180
@@ -45,6 +46,14 @@ struct GlobeFlight {
         let v = fromVector * a + toVector * b
         return CLLocationCoordinate2D(latitude: asin(min(1, max(-1, v.z))) * 180 / .pi,
                                       longitude: atan2(v.y, v.x) * 180 / .pi)
+    }
+
+    /// A geographic prefix of the flight, including its exact current coordinate.
+    /// Screen-space stroke percentages cannot represent progress on a projected globe.
+    func coordinates(through progress: Double = 1) -> [CLLocationCoordinate2D] {
+        let end = min(1, max(0, progress))
+        let segments = max(1, Int(ceil(angleRadians * end / (.pi / 720))))
+        return (0...segments).map { coordinate(at: end * Double($0) / Double(segments)) }
     }
 
     /// Altitude as a fraction of cruise height: smooth takeoff, level middle, smooth landing.
@@ -102,16 +111,17 @@ struct GlobeItinerary {
         let coordinate: CLLocationCoordinate2D
         /// A point slightly further along the path, for heading.
         let ahead: CLLocationCoordinate2D
+        let heading: Double
         let altitude: Double
         let legIndex: Int
-        /// Eased progress along the current leg, 0...1.
+        /// Distance progress along the current leg, 0...1.
         let legProgress: Double
         /// Overall wall-time progress, 0...1.
         let progress: Double
     }
 
-    /// Where the jet is after `seconds` of animation. Each leg eases in and out on its own so
-    /// takeoffs and landings read, while the total time stays one second per flight hour.
+    /// Constant ground speed on each geodesic; only altitude changes for takeoff/landing.
+    /// Short legs take at least three seconds so adjacent European venues are visible.
     func position(at seconds: Double) -> Position? {
         guard !legs.isEmpty else { return nil }
         let total = durationSeconds
@@ -121,8 +131,12 @@ struct GlobeItinerary {
             let end = start + leg.durationSeconds
             if elapsed <= end || index == legs.count - 1 {
                 let raw = leg.durationSeconds > 0 ? min(1, max(0, (elapsed - start) / leg.durationSeconds)) : 1
-                let t = raw * raw * (3 - 2 * raw)
-                return Position(coordinate: leg.coordinate(at: t), ahead: leg.coordinate(at: min(1, t + 0.01)),
+                let t = raw
+                let before = leg.coordinate(at: max(0, t - 0.001))
+                let after = leg.coordinate(at: min(1, t + 0.001))
+                let heading = GeoPoint(latitude: before.latitude, longitude: before.longitude)
+                    .bearing(to: GeoPoint(latitude: after.latitude, longitude: after.longitude))
+                return Position(coordinate: leg.coordinate(at: t), ahead: after, heading: heading,
                                 altitude: leg.altitudeProfile(at: t), legIndex: index, legProgress: t,
                                 progress: total > 0 ? elapsed / total : 1)
             }
