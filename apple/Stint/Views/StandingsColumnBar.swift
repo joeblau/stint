@@ -6,6 +6,7 @@ struct StandingsColumnBar: View {
     @Binding var orderIDs: String
     let compact: Bool
     @State private var showsList = false
+    @Environment(\.colorScheme) private var colorScheme
 
     private var order: [StandingsColumn] { StandingsColumn.order(from: orderIDs) }
     private var favorites: [StandingsColumn] { Array(order.prefix(StandingsColumn.favoriteCount)) }
@@ -31,6 +32,7 @@ struct StandingsColumnBar: View {
             .accessibilityHint("Shows every column. Tap one to use it; drag to reorder favorites.")
             .popover(isPresented: $showsList, arrowEdge: .top) {
                 StandingsColumnList(selectedID: $selectedID, orderIDs: $orderIDs)
+                    .preferredColorScheme(colorScheme)
             }
         }
     }

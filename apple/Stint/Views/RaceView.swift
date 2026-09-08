@@ -24,6 +24,8 @@ struct RaceView: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var glassColorScheme: ColorScheme { mode == .race && session.lightingIsDay ? .light : .dark }
+
     var body: some View {
         GeometryReader { geometry in
             let compact = geometry.size.width < 800
@@ -91,7 +93,7 @@ struct RaceView: View {
             }
             #endif
         }
-        .preferredColorScheme(mode == .race && session.lightingIsDay ? .light : .dark)
+        .preferredColorScheme(glassColorScheme)
         .tint(StintPalette.red)
         .buttonStyle(.plain)
         #if os(iOS)
@@ -276,7 +278,7 @@ struct RaceView: View {
         VStack(spacing: 10) {
             VStack(spacing: 0) {
                 control("map", label: "Map appearance") { showsSettings.toggle() }
-                    .popover(isPresented: $showsSettings, arrowEdge: .trailing) { settings }
+                    .popover(isPresented: $showsSettings, arrowEdge: .trailing) { settings.preferredColorScheme(glassColorScheme) }
                 Divider().frame(width: 24)
                 control(session.lighting.symbol, label: "Map lighting", active: session.lighting != .night) { showsLighting.toggle() }
                     .accessibilityValue(session.lighting.rawValue)
@@ -301,6 +303,7 @@ struct RaceView: View {
                                 Text(session.lightingTimeLabel).font(.caption).foregroundStyle(.secondary)
                             }
                         }.padding(20).frame(width: 230)
+                            .preferredColorScheme(glassColorScheme)
                     }
             }
             .glassPanel(in: Capsule())
