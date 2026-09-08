@@ -1,0 +1,13 @@
+Model Information:
+* title:   2026 Aston Martin AMR26
+* source:  https://sketchfab.com/3d-models/2026-aston-martin-amr26-be9fbc27a1fd4e97ad4302f5aa5125d5
+* author:  Dave Love SketchFab (https://sketchfab.com/Tyler_Dave)
+
+Model License:
+* license type: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements: Author must be credited. Commercial use is allowed.
+
+Credit:
+This work is based on "2026 Aston Martin AMR26" (https://sketchfab.com/3d-models/2026-aston-martin-amr26-be9fbc27a1fd4e97ad4302f5aa5125d5) by Dave Love SketchFab (https://sketchfab.com/Tyler_Dave) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/).
+
+Stint uses the geometry only: the livery textures were removed and the bodywork is tinted with each team's color. The cockpit interior was dropped and the mesh was decimated to about 25k triangles per car.
