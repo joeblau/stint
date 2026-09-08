@@ -106,6 +106,8 @@ struct TelemetryGaugeView: View {
                     Text(speed.map { "\(Int($0.rounded()))" } ?? "—")
                         .font(.system(size: diameter * 0.18, weight: .bold, design: .rounded))
                         .monospacedDigit()
+                        .contentTransition(.numericText(value: speed ?? 0))
+                        .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: speed.map { Int($0.rounded()) })
                         .foregroundStyle(StintPalette.white)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
@@ -127,6 +129,8 @@ struct TelemetryGaugeView: View {
             VStack(spacing: 0) {
                 Text(telemetry.rpm.map { "\($0)" } ?? "—")
                     .font(.system(size: diameter * 0.074, weight: .semibold, design: .monospaced))
+                    .contentTransition(.numericText(value: Double(telemetry.rpm ?? 0)))
+                    .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: telemetry.rpm)
                     .foregroundStyle(StintPalette.white)
                 Text("RPM")
                     .font(.system(size: diameter * 0.043, weight: .medium)).tracking(1)
@@ -153,6 +157,9 @@ struct TelemetryGaugeView: View {
                     .foregroundStyle(StintPalette.white.opacity(0.55))
                 Text(telemetry.gear.map { "\($0)" } ?? "—")
                     .font(.system(size: diameter * 0.088, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .contentTransition(.numericText(value: Double(telemetry.gear ?? 0)))
+                    .animation(reduceMotion ? nil : .snappy(duration: 0.25), value: telemetry.gear)
                     .foregroundStyle(StintPalette.white)
             }
             .position(x: diameter * 0.5, y: diameter * 0.79)
