@@ -4,8 +4,9 @@ enum GaugeSpeedUnit: String {
     case kph, mph
     var label: String { self == .kph ? "KM/H" : "MPH" }
     var spokenLabel: String { self == .kph ? "kilometers per hour" : "miles per hour" }
-    var maximum: Double { self == .kph ? 360 : 240 }
-    var tickStep: Double { self == .kph ? 60 : 40 }
+    /// F1 cars peak near 350–360 km/h (Monza, Baku), so both scales top out there: 360 km/h ≈ 224 mph.
+    var maximum: Double { self == .kph ? 360 : 225 }
+    var tickStep: Double { self == .kph ? 60 : 45 }
     func value(fromKPH speed: Double) -> Double { self == .kph ? speed : speed / 1.609344 }
 }
 
@@ -69,7 +70,9 @@ struct TelemetryGaugeView: View {
     private var tickLabels: some View {
         ZStack {
             ForEach(Array(stride(from: 0.0, through: unit.maximum, by: unit.tickStep)), id: \.self) { value in
-                let angle = Self.scaleStart + Self.scaleSweep * value / unit.maximum
+                // Pull the end labels inside the ring's round caps so they never hang past the gauge edge.
+                let inset = value == 0 ? 4.0 : (value >= unit.maximum ? 9.0 : 0)
+                let angle = Self.scaleStart + Self.scaleSweep * value / unit.maximum + (value == 0 ? inset : -inset)
                 // Tangent to the ridge, keeping the lower end labels upright.
                 let tangent = (angle + 90).truncatingRemainder(dividingBy: 360)
                 Text("\(Int(value))")
