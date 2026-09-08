@@ -243,6 +243,13 @@ struct SeasonCalendarView: View {
             Text(race.name).font(.system(size: 22, weight: .semibold, design: .rounded))
             Text(race.circuit.subtitle).font(.system(size: 12)).foregroundStyle(.secondary)
             Text("\(race.dateLabel) 2026").font(.system(size: 13, weight: .medium, design: .monospaced))
+            if let previous = Season2026.races.first(where: { $0.round == race.round - 1 }) {
+                let leg = GlobeFlight(from: previous.point.coordinate, to: race.point.coordinate)
+                Label("From \(previous.cityName) · \(Int(leg.distanceKm.rounded())) km · \(leg.durationLabel)", systemImage: "airplane")
+                    .font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+                    .accessibilityLabel("Flight from \(previous.cityName): \(Int(leg.distanceKm.rounded())) kilometers, \(leg.durationLabel)")
+                    .accessibilityIdentifier("calendar-flight-leg")
+            }
             Button { onOpenRace(race.circuit) } label: {
                 HStack {
                     Text(library.isSaved(race) ? "Play saved replay" : "Open race")

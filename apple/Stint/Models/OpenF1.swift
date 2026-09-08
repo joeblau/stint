@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// Historical OpenF1 requests are unauthenticated, limited to 30/minute.
 /// Endpoint schemas: https://openf1.org/docs/
@@ -6,32 +7,66 @@ actor OpenF1Client {
     private let session: URLSession
     private let baseURL: URL
     private let requestSpacing: TimeInterval
+    private let retryDelay: TimeInterval
+    private let cacheDirectory: URL?
     private var nextRequest = Date.distantPast
 
-    init(session: URLSession = .shared, baseURL: URL = URL(string: "https://api.openf1.org/v1")!, requestSpacing: TimeInterval = 2.1) {
+    static var defaultCacheDirectory: URL? {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Stint/OpenF1", isDirectory: true)
+    }
+
+    init(session: URLSession = .shared, baseURL: URL = URL(string: "https://api.openf1.org/v1")!,
+         requestSpacing: TimeInterval = 2.1, retryDelay: TimeInterval = 5,
+         cacheDirectory: URL? = OpenF1Client.defaultCacheDirectory) {
         self.session = session
         self.baseURL = baseURL
         self.requestSpacing = requestSpacing
+        self.retryDelay = retryDelay
+        self.cacheDirectory = cacheDirectory
     }
 
     func get<T: Decodable>(_ endpoint: String, query: [String: String]) async throws -> [T] {
-        var components = URLComponents(url: baseURL.appendingPathComponent(endpoint), resolvingAgainstBaseURL: false)!
-        components.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
-        for attempt in 0..<3 {
+        try Task.checkCancellation()
+        let url = requestURL(endpoint, query: query)
+        // Keep successful historical responses so a retry resumes after the failed request.
+        // Session discovery stays fresh; empty and rejected location feeds are never retained.
+        let cache = query["session_key"] == nil ? nil : cacheURL(url)
+        if let cache, let modified = try? cache.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate,
+           Date().timeIntervalSince(modified) < 86_400, let data = try? Data(contentsOf: cache),
+           let result = try? Self.decoder().decode([T].self, from: data) {
+            return result
+        }
+        for attempt in 0..<4 {
             let slot = max(Date(), nextRequest)
             nextRequest = slot.addingTimeInterval(requestSpacing)
             let delay = slot.timeIntervalSinceNow
             if delay > 0 { try await Task.sleep(for: .seconds(delay)) }
             try Task.checkCancellation()
-            var request = URLRequest(url: components.url!)
+            var request = URLRequest(url: url)
             request.timeoutInterval = 120
-            let (data, response) = try await session.data(for: request)
+            let data: Data
+            let response: URLResponse
+            do {
+                (data, response) = try await session.data(for: request)
+            } catch let error as URLError where attempt < 3 && [
+                .timedOut, .networkConnectionLost, .notConnectedToInternet,
+                .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed
+            ].contains(error.code) {
+                try await Task.sleep(for: .seconds(retryDelay * pow(2, Double(attempt))))
+                continue
+            }
             guard let response = response as? HTTPURLResponse else { throw ReplayError.invalid("OpenF1 returned an invalid response.") }
             if response.statusCode == 429 || (500...599).contains(response.statusCode) {
-                guard attempt < 2 else { throw ReplayError.invalid("OpenF1 is busy. Please try the download again shortly.") }
-                let retry = response.value(forHTTPHeaderField: "Retry-After").flatMap(Double.init) ?? Double(5 * (attempt + 1))
-                try await Task.sleep(for: .seconds(min(60, max(2.1, retry))))
+                guard attempt < 3 else { throw ReplayError.invalid("OpenF1 is busy. Retry the download to continue from the data already downloaded.") }
+                let retry = response.value(forHTTPHeaderField: "Retry-After").flatMap(Double.init) ?? retryDelay * pow(2, Double(attempt))
+                // Reserve the next slot too, so other requests on this client respect the backoff.
+                nextRequest = max(nextRequest, Date().addingTimeInterval(max(0, retry)))
                 continue
+            }
+            if response.statusCode == 404,
+               (try? JSONDecoder().decode(APIError.self, from: data).detail) == "No results found." {
+                return []
             }
             guard response.statusCode == 200 else {
                 if [401, 403].contains(response.statusCode) {
@@ -40,9 +75,49 @@ actor OpenF1Client {
                 throw ReplayError.invalid("OpenF1 couldn’t provide \(endpoint) (HTTP \(response.statusCode)). Try again later.")
             }
             guard data.count <= 100_000_000 else { throw ReplayError.invalid("The OpenF1 response is too large to load.") }
-            return try Self.decoder().decode([T].self, from: data)
+            let result = try Self.decoder().decode([T].self, from: data)
+            if !result.isEmpty, let cache {
+                try? FileManager.default.createDirectory(at: cache.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try? data.write(to: cache, options: .atomic)
+                trimCache()
+            }
+            return result
         }
         throw ReplayError.invalid("OpenF1 is unavailable. Try again later.")
+    }
+
+    func invalidate(_ endpoint: String, query: [String: String]) {
+        if let cache = cacheURL(requestURL(endpoint, query: query)) { try? FileManager.default.removeItem(at: cache) }
+    }
+
+    private struct APIError: Decodable { let detail: String }
+
+    private func requestURL(_ endpoint: String, query: [String: String]) -> URL {
+        var components = URLComponents(url: baseURL.appendingPathComponent(endpoint), resolvingAgainstBaseURL: false)!
+        components.queryItems = query.sorted { $0.key < $1.key }.map { URLQueryItem(name: $0.key, value: $0.value) }
+        return components.url!
+    }
+
+    private func cacheURL(_ url: URL) -> URL? {
+        let key = SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined()
+        return cacheDirectory?.appendingPathComponent(key + ".json")
+    }
+
+    private func trimCache() {
+        guard let cacheDirectory, let files = try? FileManager.default.contentsOfDirectory(
+            at: cacheDirectory, includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey]) else { return }
+        let entries = files.compactMap { url -> (url: URL, date: Date, size: Int)? in
+            guard let values = try? url.resourceValues(forKeys: [.contentModificationDateKey, .fileSizeKey]),
+                  let date = values.contentModificationDate, let size = values.fileSize else { return nil }
+            return (url, date, size)
+        }.sorted { $0.date > $1.date }
+        var bytes = 0
+        for entry in entries {
+            bytes += entry.size
+            if Date().timeIntervalSince(entry.date) >= 86_400 || bytes > 512_000_000 {
+                try? FileManager.default.removeItem(at: entry.url)
+            }
+        }
     }
 
     static func decoder() -> JSONDecoder {
@@ -156,10 +231,13 @@ enum OpenF1 {
 
 enum OpenF1DownloadError: LocalizedError {
     case incompleteLocations(String)
+    case noUsableLocations
     var errorDescription: String? {
         switch self {
         case .incompleteLocations(let driver):
             "OpenF1’s car-location data for \(driver) doesn’t cover the recorded race yet. No partial replay was saved. Please try again later."
+        case .noUsableLocations:
+            "This race has no complete, usable car-location feed. A map replay can’t be saved from the available data."
         }
     }
 }

@@ -337,11 +337,8 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
             articulationTimes.removeAll()
             articulations.removeAll()
             if let replay = session.replay {
-                let route = CircuitRoute(points: replay.circuit)
-                for (index, sector) in route.sectors().enumerated() {
-                    let line = MKPolyline(coordinates: sector.map(\.coordinate), count: sector.count)
-                    line.title = "sector-\(index)"
-                    map.addOverlay(line)
+                if let track = TrackSurfaceOverlay(points: replay.circuit) {
+                    map.addOverlay(track, level: .aboveRoads)
                 }
                 for recording in replay.recordings {
                     let rig = CarGeometry.make(color: recording.driver.color)
@@ -744,16 +741,8 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     }
 
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        guard let line = overlay as? MKPolyline else { return MKOverlayRenderer(overlay: overlay) }
-        let renderer = MKPolylineRenderer(polyline: line)
-        // Process cyan / magenta / yellow, meeting flush at the sector boundaries.
-        let sectorColors = ["#00AEEF", "#EC008C", "#FFF200"]
-        let index = line.title?.split(separator: "-").last.flatMap { Int($0) } ?? 0
-        renderer.strokeColor = PlatformColor(hex: sectorColors[index % sectorColors.count]).withAlphaComponent(0.65)
-        renderer.lineWidth = 5
-        renderer.lineJoin = .round
-        renderer.lineCap = .butt
-        return renderer
+        guard let track = overlay as? TrackSurfaceOverlay else { return MKOverlayRenderer(overlay: overlay) }
+        return TrackSurfaceRenderer(track: track)
     }
 
     #if os(macOS)
@@ -786,6 +775,64 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         if let nearest, hypot(nearest.value.x - point.x, nearest.value.y - point.y) < 32 {
             session.selectedDriverID = nearest.key
         }
+    }
+}
+
+/// The bundled paths have no surveyed widths. Start with a uniform 12-meter surface.
+private final class TrackSurfaceOverlay: NSObject, MKOverlay {
+    let coordinate: CLLocationCoordinate2D
+    let boundingMapRect: MKMapRect
+    let points: [MKMapPoint]
+    let width: CGFloat
+    let edgeWidth: CGFloat
+
+    init?(points: [GeoPoint]) {
+        guard points.count >= 3, points.allSatisfy(\.isValid) else { return nil }
+        var coordinates = points.map(\.coordinate)
+        if points.first != points.last { coordinates.append(coordinates[0]) }
+        let line = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        coordinate = line.coordinate
+        self.points = coordinates.map(MKMapPoint.init)
+        let unitsPerMeter = MKMapPointsPerMeterAtLatitude(coordinate.latitude)
+        width = 12 * unitsPerMeter
+        edgeWidth = 0.2 * unitsPerMeter
+        boundingMapRect = line.boundingMapRect.insetBy(dx: -width, dy: -width)
+        super.init()
+    }
+}
+
+private final class TrackSurfaceRenderer: MKOverlayRenderer {
+    private let trackPath = CGMutablePath()
+    private let trackWidth: CGFloat
+    private let edgeWidth: CGFloat
+    private let asphalt = CGColor(gray: 0.19, alpha: 1)
+    private let edge = CGColor(gray: 0.87, alpha: 1)
+
+    init(track: TrackSurfaceOverlay) {
+        trackWidth = track.width
+        edgeWidth = track.edgeWidth
+        super.init(overlay: track)
+        for (index, mapPoint) in track.points.enumerated() {
+            let local = point(for: mapPoint)
+            if index == 0 { trackPath.move(to: local) } else { trackPath.addLine(to: local) }
+        }
+        trackPath.closeSubpath()
+    }
+
+    override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
+        context.saveGState()
+        context.setLineJoin(.round)
+        context.setLineCap(.round)
+        // Physical map-space widths stay attached to the ground as the camera zooms or tilts.
+        context.addPath(trackPath)
+        context.setStrokeColor(edge)
+        context.setLineWidth(trackWidth)
+        context.strokePath()
+        context.addPath(trackPath)
+        context.setStrokeColor(asphalt)
+        context.setLineWidth(trackWidth - 2 * edgeWidth)
+        context.strokePath()
+        context.restoreGState()
     }
 }
 

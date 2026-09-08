@@ -27,7 +27,7 @@ struct TelemetryGaugeView: View {
             : [StintPalette.pitGray, StintPalette.asphalt, StintPalette.trackBlack],
         center: .center, startAngle: .degrees(135), endAngle: .degrees(405)) }
     private static let throttleGradient = AngularGradient(
-        colors: [Color(hex: "#28734B"), StintPalette.telemetryActive, Color(hex: "#B7E9CA")],
+        colors: [Color(hex: "#00A844"), Color(hex: "#00E85B"), Color(hex: "#69FF85")],
         center: .center, startAngle: .degrees(135), endAngle: .degrees(263))
     private static let red = StintPalette.red
     private static let scaleStart = 135.0

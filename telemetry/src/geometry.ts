@@ -1,4 +1,4 @@
-export interface Point { x: number; y: number; z: number }
+export interface Point { x: number; y: number; z: number; /** Right/left track half-widths in meters, when sourced from measured geometry. */ wr?: number; wl?: number }
 export interface RouteDefinition {
   id: string; kind: "track" | "pit"; closed: boolean; points: Point[];
   /** Track distances at the endpoints of an open pit route, if surveyed/verified. */

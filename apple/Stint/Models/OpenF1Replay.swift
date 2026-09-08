@@ -138,7 +138,9 @@ enum OpenF1ReplayBuilder {
                                           throttle: car?.throttle.map { min(1, max(0, $0 / 100)) },
                                           brake: car?.brake.map { min(1, max(0, $0 / 100)) },
                                           drs: car?.drs.map { [10, 12, 14].contains($0) },
-                                          gear: car?.nGear, rpm: car?.rpm))
+                                          // Invalid optional channels must not invalidate the race replay.
+                                          gear: car?.nGear.flatMap { (0...8).contains($0) ? $0 : nil },
+                                          rpm: car?.rpm.flatMap { (0...25_000).contains($0) ? $0 : nil }))
         }
         guard samples.count >= 2 else { throw ReplayError.invalid("OpenF1 is missing location data for \(driver.name). No partial replay was saved.") }
         if samples[0].time > 0 {

@@ -12,6 +12,14 @@ struct SeasonRace: Identifiable, Equatable {
     let point: GeoPoint
     var id: Int { round }
     var circuit: DemoCircuit { DemoCircuit.allCases.first { $0.id == circuitID }! }
+    var cityName: String {
+        switch circuitID {
+        case "interlagos": "São Paulo"
+        case "yasmarina": "Abu Dhabi"
+        case "spafrancorchamps": "Spa"
+        default: circuit.title
+        }
+    }
     var calendar: Calendar {
         var value = Calendar(identifier: .gregorian)
         value.timeZone = TimeZone(identifier: timeZoneID)!

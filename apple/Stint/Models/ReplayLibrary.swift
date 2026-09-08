@@ -68,6 +68,13 @@ actor RaceReplayDownloader {
             .compactMap { $0.value.first }.sorted { $0.driverNumber < $1.driverNumber }
         guard !field.isEmpty, field.count <= 24, let start = laps.filter({ $0.lapNumber == 1 }).compactMap(\.dateStart).min(),
               start < session.dateEnd else { throw ReplayError.invalid("OpenF1 has no complete race timing for this weekend yet.") }
+        // Session metadata contains the scheduled finish; red flags can extend the race.
+        let recordedFinish = laps.compactMap { lap -> Date? in
+            guard let start = lap.dateStart, let duration = lap.lapDuration,
+                  duration.isFinite, duration > 0 else { return nil }
+            return start.addingTimeInterval(duration)
+        }.max()
+        let end = max(session.dateEnd, recordedFinish ?? session.dateEnd)
         let circuit = try race.circuit.loadCircuit()
         var transform: OpenF1MapTransform?
         var recordings: [DriverRecording] = []
@@ -89,6 +96,7 @@ actor RaceReplayDownloader {
             do {
                 try OpenF1ReplayBuilder.validateCoverage(locations: locations, laps: driverLaps, driver: info.driver.name)
             } catch is OpenF1DownloadError {
+                await client.invalidate("location", query: driverQuery)
                 skipped.append(info.driver.name)
                 continue
             }
@@ -99,6 +107,7 @@ actor RaceReplayDownloader {
                 } catch {
                     // This driver has no lap that aligns with the map; a later one may.
                     skipped.append(info.driver.name)
+                    await client.invalidate("location", query: driverQuery)
                     continue
                 }
             }
@@ -107,14 +116,14 @@ actor RaceReplayDownloader {
                 let recording = try OpenF1ReplayBuilder.recording(driver: info.driver, locations: locations, telemetry: telemetry,
                     positions: positions.filter { $0.driverNumber == info.driverNumber },
                     intervals: intervals.filter { $0.driverNumber == info.driverNumber },
-                    stints: stints.filter { $0.driverNumber == info.driverNumber }, transform: transform!, start: start, end: session.dateEnd)
+                    stints: stints.filter { $0.driverNumber == info.driverNumber }, transform: transform!, start: start, end: end)
                 recordings.append(recording)
             } catch is ReplayError {
                 skipped.append(info.driver.name)
             }
         }
         guard !recordings.isEmpty else {
-            throw ReplayError.invalid("OpenF1 has no usable car-location data for this race yet. Please try again later.")
+            throw OpenF1DownloadError.noUsableLocations
         }
         if !skipped.isEmpty {
             await progress(0.96, "Skipped \(skipped.count) driver\(skipped.count == 1 ? "" : "s") without location data: \(skipped.joined(separator: ", "))")
