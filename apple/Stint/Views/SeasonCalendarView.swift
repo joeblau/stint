@@ -252,13 +252,22 @@ struct SeasonCalendarView: View {
                     .accessibilityIdentifier("calendar-flight-leg")
             }
             Button { flyoverRequest = UUID() } label: {
-                Label("Fly over circuit", systemImage: "video")
-                    .font(.system(size: 11, weight: .medium)).foregroundStyle(.secondary)
-                    .contentShape(Rectangle())
+                HStack {
+                    Label("Fly over circuit", systemImage: "video")
+                    Spacer()
+                    Image(systemName: "play.fill").font(.system(size: 10, weight: .semibold))
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.primary)
+                .padding(12)
+                .frame(maxWidth: .infinity)
+                .background(.primary.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.primary.opacity(0.2), lineWidth: 1))
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("flyover-circuit")
-            .help("Settle above the track, chase one lap, then pull back")
+            .help("Take a low, slow lap of the circuit. Drag, pinch, or rotate to explore freely.")
             Button { onOpenRace(race.circuit) } label: {
                 HStack {
                     Text(library.isSaved(race) ? "Play saved replay" : "Open race")
