@@ -54,6 +54,15 @@ final class OpenF1ReplayTests: XCTestCase {
         }
     }
 
+    func testIncompleteAndInterruptedLocationCoverageIsRejected() throws {
+        let start = Date(timeIntervalSince1970: 1000)
+        let laps = [OpenF1.Lap(driverNumber: 16, lapNumber: 1, dateStart: start, lapDuration: 180, isPitOutLap: false)]
+        func location(_ time: Double) -> OpenF1.Location { .init(date: start.addingTimeInterval(time), x: 10, y: 20) }
+        XCTAssertThrowsError(try OpenF1ReplayBuilder.validateCoverage(locations: [location(0), location(10)], laps: laps, driver: "LEC"))
+        XCTAssertThrowsError(try OpenF1ReplayBuilder.validateCoverage(locations: [location(0), location(180)], laps: laps, driver: "LEC"))
+        XCTAssertNoThrow(try OpenF1ReplayBuilder.validateCoverage(locations: stride(from: 0.0, through: 180, by: 10).map(location), laps: laps, driver: "LEC"))
+    }
+
     func testDegenerateLocationTraceIsRejected() throws {
         XCTAssertThrowsError(try OpenF1MapTransform.fit(lap: Array(repeating: SIMD2(2.0, 3.0), count: 50), circuit: try DemoCircuit.monaco.loadCircuit()))
     }

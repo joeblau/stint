@@ -174,6 +174,28 @@ final class MapFlowTests: XCTestCase {
         add(overview)
     }
 
+    @MainActor func testCalendarDownloadControls() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-hud-auto-hide", "NO"]
+        app.launch()
+        revealControls(app)
+        app.buttons["tab-calendar"].press()
+        let row = app.buttons["calendar-race-melbourne"]
+        expectation(for: NSPredicate(format: "isHittable == true"), evaluatedWith: row)
+        waitForExpectations(timeout: 10)
+        let download = app.buttons["download-race-melbourne"]
+        XCTAssertTrue(download.isHittable)
+        XCTAssertTrue(download.isEnabled)
+        XCTAssertFalse(app.buttons["import-replay"].exists)
+        row.press()
+        XCTAssertTrue(app.buttons["open-calendar-race"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["download-race-melbourne"].exists)
+        let attachment = XCTAttachment(screenshot: screenshot(app))
+        attachment.name = "Calendar race downloads"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     @MainActor func testCalendarGlobeAndOpeningRace() {
         let app = XCUIApplication()
         app.launchArguments = ["-hud-auto-hide", "NO"]

@@ -78,6 +78,25 @@ struct OpenF1MapTransform {
 }
 
 enum OpenF1ReplayBuilder {
+    static func validateCoverage(locations: [OpenF1.Location], laps: [OpenF1.Lap], driver: String) throws {
+        let valid = locations.filter { $0.x.isFinite && $0.y.isFinite && ($0.x != 0 || $0.y != 0) }
+        let starts = laps.compactMap(\.dateStart)
+        let finishes = laps.compactMap { lap -> Date? in
+            guard let start = lap.dateStart, let duration = lap.lapDuration, duration > 0 else { return nil }
+            return start.addingTimeInterval(duration)
+        }
+        guard let expectedStart = starts.min(), let expectedEnd = finishes.max(),
+              let first = valid.map(\.date).min(), let last = valid.map(\.date).max(),
+              first <= expectedStart.addingTimeInterval(30), last >= expectedEnd.addingTimeInterval(-30) else {
+            throw OpenF1DownloadError.incompleteLocations(driver)
+        }
+        let raceLocations = valid.filter { $0.date >= expectedStart && $0.date <= expectedEnd }.sorted { $0.date < $1.date }
+        // Short feed gaps are interpolated. Long outages cannot be presented as a full race.
+        guard zip(raceLocations, raceLocations.dropFirst()).allSatisfy({ $1.date.timeIntervalSince($0.date) <= 60 }) else {
+            throw OpenF1DownloadError.incompleteLocations(driver)
+        }
+    }
+
     static func transform(locations: [OpenF1.Location], laps: [OpenF1.Lap], circuit: [GeoPoint]) throws -> OpenF1MapTransform {
         for lap in laps.sorted(by: { ($0.lapDuration ?? .infinity) < ($1.lapDuration ?? .infinity) }) {
             guard lap.lapNumber > 1, lap.isPitOutLap != true, let start = lap.dateStart,

@@ -153,3 +153,13 @@ enum OpenF1 {
         let compound: String?
     }
 }
+
+enum OpenF1DownloadError: LocalizedError {
+    case incompleteLocations(String)
+    var errorDescription: String? {
+        switch self {
+        case .incompleteLocations(let driver):
+            "OpenF1’s car-location data for \(driver) doesn’t cover the recorded race yet. No partial replay was saved. Please try again later."
+        }
+    }
+}

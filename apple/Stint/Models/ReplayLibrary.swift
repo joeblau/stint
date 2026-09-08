@@ -82,6 +82,8 @@ actor RaceReplayDownloader {
             var driverQuery = query
             driverQuery["driver_number"] = String(info.driverNumber)
             let locations: [OpenF1.Location] = try await client.get("location", query: driverQuery)
+            try OpenF1ReplayBuilder.validateCoverage(locations: locations,
+                laps: laps.filter { $0.driverNumber == info.driverNumber }, driver: info.driver.name)
             let telemetry: [OpenF1.CarData] = try await client.get("car_data", query: driverQuery)
             if transform == nil {
                 transform = try OpenF1ReplayBuilder.transform(locations: locations.sorted { $0.date < $1.date },

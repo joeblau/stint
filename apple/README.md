@@ -78,7 +78,7 @@ The circuit library includes all 23 venues on the [current 2026 calendar](https:
 
 Downloaded replays are saved atomically in the app’s Application Support directory under `Stint/Replays/2026-<circuit>.json`. Each file includes its OpenF1 session key, year, circuit ID, download date, actual race start time, geographic circuit, and converted replay. Saved replay data reopens without contacting OpenF1; Apple Maps imagery still depends on MapKit’s network/cache.
 
-Historical data is available without authentication after OpenF1’s live window (30 minutes after a session ends). The downloader spaces requests by 2.1 seconds and retries rate limits/server errors. It matches the exact season, weekend, and venue, excludes cancelled sessions, and never substitutes another year’s race. A full field can take several minutes to download.
+Historical data is available without authentication after OpenF1’s live window (30 minutes after a session ends). The downloader spaces requests by 2.1 seconds and retries rate limits/server errors. It matches the exact season, weekend, and venue, excludes cancelled sessions, and never substitutes another year’s race. A full field can take several minutes to download. Car-location coverage must reach each driver’s final recorded lap, with no gaps longer than a minute; incomplete feeds are reported as unavailable and are not saved.
 
 The internal replay payload uses this format:
 
