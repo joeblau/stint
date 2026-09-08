@@ -54,6 +54,7 @@ struct RaceView: View {
                         VStack(alignment: .trailing, spacing: 16) {
                             if let recording = session.replay?.recordings.first(where: { $0.driver.id == session.selectedDriverID }) {
                                 TelemetryGaugeView(telemetry: TelemetryEstimator.estimate(recording: recording, at: session.time),
+                                                   raceYear: session.replay?.startDate.map { Calendar(identifier: .gregorian).component(.year, from: $0) } ?? 2026,
                                                    diameter: compact ? 170 : 210)
                             }
                             Spacer(minLength: 8)

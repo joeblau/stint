@@ -12,6 +12,7 @@ enum GaugeSpeedUnit: String {
 
 struct TelemetryGaugeView: View {
     let telemetry: Telemetry
+    var raceYear: Int = 2026
     var diameter: CGFloat = 210
     @AppStorage("telemetry-speed-unit") private var unit = GaugeSpeedUnit.kph
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -35,6 +36,7 @@ struct TelemetryGaugeView: View {
     private var speedFraction: Double { min(1, max(0, (speed ?? 0) / unit.maximum)) }
     private var throttle: Double { min(1, max(0, telemetry.throttle)) }
     private var brake: Double { min(1, max(0, telemetry.brake)) }
+    private var activationLabel: String { raceYear >= 2026 ? "BOOST" : "DRS" }
 
     var body: some View {
         ZStack {
@@ -141,7 +143,7 @@ struct TelemetryGaugeView: View {
             }
             .accessibilityElement(children: .combine)
 
-            Text("DRS")
+            Text(activationLabel)
                 .font(.system(size: diameter * 0.047, weight: .bold))
                 .foregroundStyle(telemetry.drs ? StintPalette.trackBlack : ink.opacity(0.7))
                 .padding(.horizontal, diameter * 0.04).padding(.vertical, diameter * 0.01)
@@ -151,7 +153,7 @@ struct TelemetryGaugeView: View {
                     .strokeBorder(telemetry.drs ? StintPalette.telemetryActive : .clear, lineWidth: 1))
                 .shadow(color: telemetry.drs ? StintPalette.telemetryActive.opacity(0.8) : .clear, radius: diameter * 0.035)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: telemetry.drs)
-                .accessibilityLabel("DRS \(telemetry.drs ? "on" : "off")")
+                .accessibilityLabel("\(activationLabel) \(telemetry.drs ? "on" : "off")")
 
             HStack(alignment: .firstTextBaseline, spacing: diameter * 0.018) {
                 Text("GEAR").font(.system(size: diameter * 0.047, weight: .medium)).tracking(1)
@@ -187,4 +189,3 @@ private struct Arc: Shape {
         return path
     }
 }
-
