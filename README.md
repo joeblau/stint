@@ -2,6 +2,9 @@
 
 Monorepo for the Stint race viewer, managed with [Turborepo](https://turborepo.dev) and Bun workspaces.
 
+**[Download for Mac](https://github.com/joeblau/stint/releases/latest/download/Stint-macOS.zip)** (macOS 15+, runs on macOS 26 — unsigned build: right-click → Open on first launch)
+
+
 ## Layout
 
 - **`apple/`** — the native Mac and iPad app (SwiftUI, MapKit, SceneKit). See `apple/README.md` for details.
