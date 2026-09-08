@@ -20,7 +20,7 @@ codesign --verify --deep --strict "$APP"
 rm -f "$ZIP"
 ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
 xcrun notarytool submit "$ZIP" --keychain-profile "$PROFILE" --wait
-xcrun notarytool staple "$APP"
+xcrun stapler staple "$APP"
 spctl --assess --type execute -vv "$APP"
 
 rm -f "$ZIP"

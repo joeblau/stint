@@ -48,6 +48,34 @@ final class RenderingPerformanceTests: XCTestCase {
         XCTAssertEqual(session.renderTime, 0)
     }
 
+    @MainActor func testPausedCarsFollowNativeMapMovementBeforeNextPlaybackTick() async throws {
+        let session = RaceSession()
+        session.isPlaying = false
+        let surface = RaceMapSurface(session: session)
+        surface.frame = CGRect(x: 0, y: 0, width: 1280, height: 820)
+        surface.layout()
+        surface.displayFrame(at: 100)
+        let car = try XCTUnwrap(session.selectedPosition)
+        for heading in [30.0, 130, 270] {
+            let camera = surface.map.camera.copy() as! MKMapCamera
+            camera.heading = heading
+            camera.pitch = 60
+            surface.map.setCamera(camera, animated: false)
+            for _ in 0..<10 { surface.mapViewDidChangeVisibleRegion(surface.map) }
+            let before = surface.projectionPassCount
+            await withCheckedContinuation { continuation in
+                DispatchQueue.main.async { continuation.resume() }
+            }
+            XCTAssertGreaterThan(surface.projectionPassCount, before)
+            let projected = try XCTUnwrap(surface.projectedPositions[car.id])
+            let native = surface.map.convert(car.point.coordinate, toPointTo: surface.map)
+            XCTAssertEqual(projected.x, native.x, accuracy: 0.5)
+            XCTAssertEqual(projected.y, native.y, accuracy: 0.5)
+            XCTAssertEqual(session.renderTime, 0, "Map movement must not advance paused replay data.")
+        }
+        surface.setActive(false)
+    }
+
     @MainActor func testHUDCachesInvalidateOnSeekAndReplayReplacement() throws {
         let session = RaceSession()
         let start = try XCTUnwrap(session.selectedPosition)

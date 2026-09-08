@@ -139,17 +139,18 @@ final class MapFlowTests: XCTestCase {
         app.launch()
         revealControls(app)
         app.buttons["Pause replay"].press()
+        let pausedPosition = app.sliders["Replay position"].value as? String
         app.buttons["Map lighting"].press()
         app.buttons["lighting-Day"].press()
         XCTAssertEqual(app.buttons["Map lighting"].value as? String, "Day")
-        try await Task.sleep(for: .seconds(1))
+        try await Task.sleep(for: .seconds(3.5))
         let day = XCTAttachment(screenshot: screenshot(app))
         day.name = "Stint day lighting"
         day.lifetime = .keepAlways
         add(day)
         app.buttons["lighting-Night"].press()
         XCTAssertEqual(app.buttons["Map lighting"].value as? String, "Night")
-        try await Task.sleep(for: .seconds(1))
+        try await Task.sleep(for: .seconds(3.5))
         let night = XCTAttachment(screenshot: screenshot(app))
         night.name = "Stint night lighting"
         night.lifetime = .keepAlways
@@ -165,6 +166,14 @@ final class MapFlowTests: XCTestCase {
         follow.name = "Stint paused follow after camera flight"
         follow.lifetime = .keepAlways
         add(follow)
+        app.buttons["driver-LEC"].press()
+        try await Task.sleep(for: .seconds(2))
+        XCTAssertTrue(app.buttons["Play replay"].exists)
+        XCTAssertEqual(app.sliders["Replay position"].value as? String, pausedPosition)
+        let switched = XCTAttachment(screenshot: screenshot(app))
+        switched.name = "Paused camera after switching to Leclerc"
+        switched.lifetime = .keepAlways
+        add(switched)
         app.buttons["Zoom out"].press()
         try await Task.sleep(for: .seconds(2))
         XCTAssertTrue(app.buttons["Follow car"].exists)

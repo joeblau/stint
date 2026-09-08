@@ -1,8 +1,8 @@
 import MapKit
 
 /// A flat MapKit map is a projective transform of Mercator ground coordinates.
-/// Four native samples determine that transform for the whole field, including
-/// perspective at low chase angles. No per-car MapKit conversions are needed.
+/// Four native samples determine local orientation and scale for the whole field,
+/// including perspective at low chase angles. Contact points use MapKit directly.
 struct GroundProjection {
     let origin: MKMapPoint
     let extent: Double
@@ -36,6 +36,31 @@ struct GroundProjection {
         [(-1.0, -1.0), (1, -1), (1, 1), (-1, 1)].map {
             MKMapPoint(x: origin.x + $0.0 * extent, y: origin.y + $0.1 * extent)
         }
+    }
+
+    /// Screen-space derivative per meter at the car's contact point. An exact
+    /// derivative avoids the skew from a ten-meter forward sample at chase zoom.
+    func tangent(at point: GeoPoint, bearing: Double) -> CGVector {
+        let center = MKMapPoint(point.coordinate)
+        let before = MKMapPoint(point.offset(meters: 0.5, bearing: bearing + 180).coordinate)
+        let after = MKMapPoint(point.offset(meters: 0.5, bearing: bearing).coordinate)
+        func wrapped(_ delta: Double) -> Double {
+            let world = MKMapSize.world.width
+            if delta > world / 2 { return delta - world }
+            if delta < -world / 2 { return delta + world }
+            return delta
+        }
+        let u = (wrapped(center.x - origin.x) / extent + 1) / 2
+        let v = ((center.y - origin.y) / extent + 1) / 2
+        let du = wrapped(after.x - before.x) / (2 * extent)
+        let dv = (after.y - before.y) / (2 * extent)
+        let w = g * u + h * v + 1
+        guard w > 0.000001 else { return CGVector(dx: Double.infinity, dy: Double.infinity) }
+        let dw = g * du + h * dv
+        let x = a * u + b * v + c
+        let y = d * u + e * v + f
+        return CGVector(dx: ((a * du + b * dv) * w - x * dw) / (w * w),
+                        dy: ((d * du + e * dv) * w - y * dw) / (w * w))
     }
 
     func project(_ point: GeoPoint) -> CGPoint {

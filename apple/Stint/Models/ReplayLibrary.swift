@@ -71,6 +71,7 @@ actor RaceReplayDownloader {
         let circuit = try race.circuit.loadCircuit()
         var transform: OpenF1MapTransform?
         var recordings: [DriverRecording] = []
+        var skipped: [String] = []
         // Try a driver with a full lap first; retirees may not have completed one.
         let orderedField = field.sorted { a, b in
             laps.filter { $0.driverNumber == a.driverNumber }.count > laps.filter { $0.driverNumber == b.driverNumber }.count
@@ -82,18 +83,41 @@ actor RaceReplayDownloader {
             var driverQuery = query
             driverQuery["driver_number"] = String(info.driverNumber)
             let locations: [OpenF1.Location] = try await client.get("location", query: driverQuery)
-            try OpenF1ReplayBuilder.validateCoverage(locations: locations,
-                laps: laps.filter { $0.driverNumber == info.driverNumber }, driver: info.driver.name)
-            let telemetry: [OpenF1.CarData] = try await client.get("car_data", query: driverQuery)
-            if transform == nil {
-                transform = try OpenF1ReplayBuilder.transform(locations: locations.sorted { $0.date < $1.date },
-                    laps: laps.filter { $0.driverNumber == info.driverNumber }, circuit: circuit)
+            let driverLaps = laps.filter { $0.driverNumber == info.driverNumber }
+            // A driver whose location feed is missing or incomplete is left out of the replay
+            // rather than failing the whole download. Network errors still abort.
+            do {
+                try OpenF1ReplayBuilder.validateCoverage(locations: locations, laps: driverLaps, driver: info.driver.name)
+            } catch is OpenF1DownloadError {
+                skipped.append(info.driver.name)
+                continue
             }
-            let recording = try OpenF1ReplayBuilder.recording(driver: info.driver, locations: locations, telemetry: telemetry,
-                positions: positions.filter { $0.driverNumber == info.driverNumber },
-                intervals: intervals.filter { $0.driverNumber == info.driverNumber },
-                stints: stints.filter { $0.driverNumber == info.driverNumber }, transform: transform!, start: start, end: session.dateEnd)
-            recordings.append(recording)
+            if transform == nil {
+                do {
+                    transform = try OpenF1ReplayBuilder.transform(locations: locations.sorted { $0.date < $1.date },
+                                                                  laps: driverLaps, circuit: circuit)
+                } catch {
+                    // This driver has no lap that aligns with the map; a later one may.
+                    skipped.append(info.driver.name)
+                    continue
+                }
+            }
+            let telemetry: [OpenF1.CarData] = try await client.get("car_data", query: driverQuery)
+            do {
+                let recording = try OpenF1ReplayBuilder.recording(driver: info.driver, locations: locations, telemetry: telemetry,
+                    positions: positions.filter { $0.driverNumber == info.driverNumber },
+                    intervals: intervals.filter { $0.driverNumber == info.driverNumber },
+                    stints: stints.filter { $0.driverNumber == info.driverNumber }, transform: transform!, start: start, end: session.dateEnd)
+                recordings.append(recording)
+            } catch is ReplayError {
+                skipped.append(info.driver.name)
+            }
+        }
+        guard !recordings.isEmpty else {
+            throw ReplayError.invalid("OpenF1 has no usable car-location data for this race yet. Please try again later.")
+        }
+        if !skipped.isEmpty {
+            await progress(0.96, "Skipped \(skipped.count) driver\(skipped.count == 1 ? "" : "s") without location data: \(skipped.joined(separator: ", "))")
         }
         await progress(0.97, "Saving replay…")
         let replay = try RaceReplay(version: 1, title: "\(race.name) 2026", circuit: circuit,

@@ -1,7 +1,36 @@
 import XCTest
+import AppKit
 @testable import Stint
 
 final class RaceLightingTests: XCTestCase {
+    @MainActor func testPausedDayNightTransitionKeepsSceneRenderingUntilFinished() async throws {
+        let session = RaceSession()
+        session.isPlaying = false
+        session.lighting = .day
+        let surface = RaceMapSurface(session: session)
+        let window = NSWindow(contentRect: CGRect(x: 0, y: 0, width: 1280, height: 820),
+                              styleMask: .borderless, backing: .buffered, defer: false)
+        window.contentView = surface
+        surface.layout()
+        surface.displayFrame(at: ProcessInfo.processInfo.systemUptime)
+        XCTAssertFalse(surface.isRenderingContinuously)
+        session.lighting = .night
+        surface.requestUpdate()
+        surface.displayFrame(at: ProcessInfo.processInfo.systemUptime)
+        XCTAssertTrue(surface.isRenderingContinuously)
+        let deadline = Date().addingTimeInterval(6)
+        while surface.isRenderingContinuously && Date() < deadline {
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        XCTAssertFalse(surface.isRenderingContinuously)
+        XCTAssertEqual(surface.map.appearance?.name, .darkAqua)
+        XCTAssertEqual(session.time, 0)
+        XCTAssertEqual(session.renderTime, 0)
+        XCTAssertFalse(session.isPlaying)
+        surface.setActive(false)
+        window.contentView = nil
+    }
+
     @MainActor func testSelectingRaceResetsLightingToScheduledRaceTime() throws {
         let session = RaceSession()
         XCTAssertEqual(session.lighting, .raceTime)

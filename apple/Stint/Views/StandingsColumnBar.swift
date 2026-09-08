@@ -135,9 +135,10 @@ struct StandingsCell: View {
     let isLeader: Bool
 
     private enum Tone {
-        case sessionBest, personalBest, slower, gained, lost, caution
+        case neutral, sessionBest, personalBest, slower, gained, lost, caution
         var background: Color {
             switch self {
+            case .neutral: Color.primary.opacity(0.12)
             case .sessionBest: Color(hex: "#8E3BFF")
             case .personalBest: Color(hex: "#1E9E5A")
             case .slower, .caution: Color(hex: "#F2C230")
@@ -147,6 +148,7 @@ struct StandingsCell: View {
         }
         var foreground: Color {
             switch self {
+            case .neutral: Color.primary
             case .slower, .caution: Color.black.opacity(0.85)
             default: StintPalette.white
             }
@@ -162,6 +164,7 @@ struct StandingsCell: View {
             case .best: lap(row?.bestLap, highlight: row?.bestLapHighlight ?? .none)
             case .diff: diff
             case .pit: pit
+            case .gap, .interval: chip(text, tone: .neutral)
             default: plain(text)
             }
         }
@@ -214,7 +217,7 @@ struct StandingsCell: View {
                 switch highlight {
                 case .sessionBest: chip(RaceTiming.lapString(seconds), tone: .sessionBest)
                 case .personalBest: chip(RaceTiming.lapString(seconds), tone: .personalBest)
-                case .none: plain(RaceTiming.lapString(seconds))
+                case .none: chip(RaceTiming.lapString(seconds), tone: .neutral)
                 }
             } else {
                 plain("—")
@@ -237,6 +240,7 @@ struct StandingsCell: View {
             switch row?.pit ?? .none {
             case .inLane: chip("IN PIT", tone: .caution)
             case .out: chip("OUT", tone: .personalBest)
+            case .stops: chip(text, tone: .neutral)
             default: plain(text)
             }
         }

@@ -221,9 +221,10 @@ struct RaceView: View {
             StandingsColumnBar(selectedID: $standingsColumnID, orderIDs: $standingsOrderIDs, compact: compact)
             let column = StandingsColumn(rawValue: standingsColumnID) ?? .gap
             let rows = session.timingRows
+            let standings = session.standings
             ScrollView {
                 VStack(spacing: 3) {
-                    ForEach(session.standings) { car in
+                    ForEach(standings) { car in
                         Button {
                             session.overlays.reveal()
                             session.selectedDriverID = car.id
@@ -232,6 +233,8 @@ struct RaceView: View {
                                 Text(car.racePosition.map(String.init) ?? "—")
                                     .font(.system(size: 11, weight: .medium, design: .monospaced))
                                     .foregroundStyle(.secondary).frame(width: 18)
+                                    .contentTransition(.numericText(value: Double(car.racePosition ?? 0)))
+                                    .animation(reduceMotion || isScrubbing ? nil : .easeInOut(duration: 0.25), value: car.racePosition)
                                 Capsule().fill(Color(hex: car.driver.color)).frame(width: 3, height: 23)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(compact ? car.id : car.driver.name.components(separatedBy: " ").last ?? car.id)
@@ -253,6 +256,9 @@ struct RaceView: View {
                         .accessibilityIdentifier("driver-\(car.id)")
                     }
                 }
+                // Stable driver IDs let SwiftUI move the existing rows during an overtake.
+                .animation(reduceMotion || isScrubbing ? nil : .smooth(duration: 0.4), value: standings.map(\.id))
+                .id(session.revision)
             }
             .scrollIndicators(.hidden)
             .frame(maxHeight: .infinity)

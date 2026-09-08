@@ -53,7 +53,7 @@ struct TelemetryGaugeView: View {
             tickLabels
             curvedLabel("THROTTLE", centerAngle: 180)
             curvedLabel("BRAKE", centerAngle: 360)
-            centerReadout.offset(y: diameter * 0.025)
+            centerReadout
         }
         .frame(width: diameter, height: diameter)
         .glassPanel(in: Circle())
@@ -107,7 +107,7 @@ struct TelemetryGaugeView: View {
     }
 
     private var centerReadout: some View {
-        ZStack {
+        VStack(spacing: diameter * 0.035) {
             Button {
                 unit = unit == .kph ? .mph : .kph
             } label: {
@@ -121,11 +121,10 @@ struct TelemetryGaugeView: View {
                         .font(.system(size: diameter * 0.047, weight: .medium)).tracking(1)
                         .foregroundStyle(ink.opacity(0.6))
                 }
-                .frame(width: diameter * 0.49, height: diameter * 0.26)
+                .frame(width: diameter * 0.49)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .position(x: diameter * 0.5, y: diameter * 0.365)
             .accessibilityLabel("Speed unit")
             .accessibilityValue(speed.map { "\(Int($0.rounded())) \(unit.spokenLabel)" } ?? "Speed unavailable")
             .accessibilityHint("Switch between kilometers and miles per hour")
@@ -140,7 +139,6 @@ struct TelemetryGaugeView: View {
                     .font(.system(size: diameter * 0.043, weight: .medium)).tracking(1)
                     .foregroundStyle(ink.opacity(0.55))
             }
-            .position(x: diameter * 0.5, y: diameter * 0.55)
             .accessibilityElement(children: .combine)
 
             Text("DRS")
@@ -153,7 +151,6 @@ struct TelemetryGaugeView: View {
                     .strokeBorder(telemetry.drs ? StintPalette.telemetryActive : .clear, lineWidth: 1))
                 .shadow(color: telemetry.drs ? StintPalette.telemetryActive.opacity(0.8) : .clear, radius: diameter * 0.035)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: telemetry.drs)
-                .position(x: diameter * 0.5, y: diameter * 0.672)
                 .accessibilityLabel("DRS \(telemetry.drs ? "on" : "off")")
 
             HStack(alignment: .firstTextBaseline, spacing: diameter * 0.018) {
@@ -164,9 +161,11 @@ struct TelemetryGaugeView: View {
                     .monospacedDigit()
                     .foregroundStyle(ink)
             }
-            .position(x: diameter * 0.5, y: diameter * 0.79)
             .accessibilityElement(children: .combine)
         }
+        .frame(width: diameter * 0.55)
+        .fixedSize(horizontal: false, vertical: true)
+        .position(x: diameter * 0.5, y: diameter * 0.575)
     }
 }
 

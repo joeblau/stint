@@ -18,6 +18,38 @@ struct RaceMapView: PlatformRepresentable {
     var playbackEnabled = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    // Snapshot control values so the representable changes even when frameTime is
+    // frozen. Holding only the observable session reference can leave a paused
+    // native view with identical inputs after driver or appearance changes.
+    private let inputs: Inputs
+    private struct Inputs: Equatable {
+        let revision: UUID
+        let cameraRequest: UUID
+        let selectedDriverID: String?
+        let lighting: RaceLighting
+        let satellite: Bool
+        let tilted: Bool
+        let followsDriver: Bool
+        let followsHeading: Bool
+        let carScale: Double
+        let showLabels: Bool
+        let isPlaying: Bool
+        let controlsVisible: Bool
+    }
+
+    @MainActor init(session: RaceSession, frameTime: Double, active: Bool = true, playbackEnabled: Bool = true) {
+        self.session = session
+        self.frameTime = frameTime
+        self.active = active
+        self.playbackEnabled = playbackEnabled
+        inputs = Inputs(revision: session.revision, cameraRequest: session.cameraRequest,
+                        selectedDriverID: session.selectedDriverID, lighting: session.lighting,
+                        satellite: session.satellite, tilted: session.tilted, followsDriver: session.followsDriver,
+                        followsHeading: session.followsHeading, carScale: session.carScale,
+                        showLabels: session.showLabels, isPlaying: session.isPlaying,
+                        controlsVisible: session.overlays.isVisible)
+    }
+
     #if os(macOS)
     func makeNSView(context: Context) -> RaceMapSurface { RaceMapSurface(session: session) }
     func updateNSView(_ view: RaceMapSurface, context: Context) { view.reduceMotion = reduceMotion; view.setActive(active); view.playbackEnabled = playbackEnabled; view.requestUpdate() }
@@ -49,7 +81,7 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     private var satellite: Bool?
     private var tilted: Bool?
     private var positions: [CarPosition] = []
-    private var projectedPositions: [String: CGPoint] = [:]
+    private(set) var projectedPositions: [String: CGPoint] = [:]
     private var followCamera = FollowCamera()
     private var followedDriverID: String?
     private var lastFollowUpdate: TimeInterval?
@@ -66,6 +98,8 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     private var previousFrame: TimeInterval?
     private var needsUpdate = true
     private var needsProjection = true
+    private var projectionScheduled = false
+    private var lastSyncedCamera: MKMapCamera?
     private var groundProjection: GroundProjection?
     private var groundProjectionDirty = true
     private(set) var projectionPassCount = 0
@@ -219,7 +253,18 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         session.displayedCamera = map.camera.copy() as? MKMapCamera
     }
 
-    func requestUpdate() { needsUpdate = true }
+    func requestUpdate() {
+        needsUpdate = true
+        startDisplayClock()
+    }
+
+    var isRenderingContinuously: Bool { sceneView.rendersContinuously }
+
+    private func updateRenderingActivity() {
+        let animating = active && ((playbackEnabled && session.isPlaying)
+                                   || cameraTransition != nil || lightingTransition != nil)
+        if sceneView.rendersContinuously != animating { sceneView.rendersContinuously = animating }
+    }
 
     private func startDisplayClock() {
         guard active else { return }
@@ -240,8 +285,20 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         } else if cameraTransition != nil {
             advanceCameraTransition(at: now)
         }
-        // Map delegate callbacks only mark dirty. Reproject at most once per display tick.
-        if needsProjection { needsProjection = false; synchronizeScene() }
+        // Consume any projection work not already handled after a native map movement,
+        // and re-anchor whenever the live camera moved since the last pass so the cars
+        // stay glued to the ground during pans and zooms.
+        if needsProjection || cameraChangedSinceSync() { needsProjection = false; synchronizeScene() }
+    }
+
+    private func cameraChangedSinceSync() -> Bool {
+        guard let last = lastSyncedCamera else { return true }
+        let cam = map.camera
+        return abs(cam.centerCoordinateDistance - last.centerCoordinateDistance) > 0.05
+            || abs(cam.heading - last.heading) > 0.01
+            || abs(cam.pitch - last.pitch) > 0.01
+            || abs(cam.centerCoordinate.latitude - last.centerCoordinate.latitude) > 0.0000001
+            || abs(cam.centerCoordinate.longitude - last.centerCoordinate.longitude) > 0.0000001
     }
 
     func update(session: RaceSession, now: TimeInterval = ProcessInfo.processInfo.systemUptime) {
@@ -440,6 +497,8 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         insertSubview(overlay, aboveSubview: map)
         #endif
         lightingTransition = transition
+        updateRenderingActivity()
+        startDisplayClock()
         // Tiles usually arrive within a few hundred milliseconds; never wait on a slow network.
         scheduleLightingStep(after: 1.5, for: transition) { [weak self] in self?.fadeInLightingTransition(transition) }
     }
@@ -478,6 +537,7 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         transition.map.delegate = nil
         transition.map.removeFromSuperview()
         lightingTransition = nil
+        updateRenderingActivity()
     }
 
     private func scheduleLightingStep(after delay: TimeInterval, for transition: LightingTransition, _ step: @escaping () -> Void) {
@@ -501,6 +561,7 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     private func finishCameraTransition() {
         if let transition = cameraTransition { map.setCamera(transition.destination, animated: false) }
         cameraTransition = nil
+        updateRenderingActivity()
     }
 
     private func resetFollowCamera() {
@@ -594,27 +655,36 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         for position in positions {
             guard let rig = carRigs[position.id], let ring = rings[position.id], let label = labels[position.id] else { continue }
             var pose = CarSceneRenderer.Pose(id: position.id, rig: rig, ring: ring, label: label)
-            let point = project(position.point)
+            // Anchor the contact point with MapKit itself. The cached homography
+            // is only used for the local orientation, never the car's screen position.
+            let point = map.convert(position.point.coordinate, toPointTo: map)
             guard point.x.isFinite, point.y.isFinite, visibleBounds.contains(point) else {
                 poses.append(pose)
                 continue
             }
             projectedPositions[position.id] = point
-            let rightPoint = project(position.point.offset(meters: 10, bearing: position.heading + 90))
-            let backPoint = project(position.point.offset(meters: 10, bearing: position.heading + 180))
-            let eastPoint = project(position.point.offset(meters: 10, bearing: mapHeading + 90))
-            guard [rightPoint.x, rightPoint.y, backPoint.x, backPoint.y, eastPoint.x, eastPoint.y].allSatisfy(\.isFinite) else {
+            func tangent(bearing: Double) -> CGVector {
+                if let groundProjection { return groundProjection.tangent(at: position.point, bearing: bearing) }
+                let a = project(position.point.offset(meters: 0.5, bearing: bearing + 180))
+                let b = project(position.point.offset(meters: 0.5, bearing: bearing))
+                return CGVector(dx: b.x - a.x, dy: b.y - a.y)
+            }
+            let rightTangent = tangent(bearing: position.heading + 90)
+            let backTangent = tangent(bearing: position.heading + 180)
+            let eastTangent = tangent(bearing: mapHeading + 90)
+            guard [rightTangent.dx, rightTangent.dy, backTangent.dx, backTangent.dy,
+                   eastTangent.dx, eastTangent.dy].allSatisfy(\.isFinite) else {
                 poses.append(pose)
                 continue
             }
-            let metersToPixels = max(0.001, hypot(eastPoint.x - point.x, eastPoint.y - point.y) / 10)
+            let metersToPixels = max(0.001, hypot(eastTangent.dx, eastTangent.dy))
             // Keep cars legible at circuit scale. This is an intentionally exaggerated model size.
             let factor = Float(max(5.5, metersToPixels) / metersToPixels * carScale)
             let yaw = Float((position.heading - mapHeading) * .pi / 180)
             let unit = Float(metersToPixels)
-            let right = SIMD3(Float(rightPoint.x - point.x) / 10, -Float(rightPoint.y - point.y) / 10,
+            let right = SIMD3(Float(rightTangent.dx), -Float(rightTangent.dy),
                               sin(yaw) * sin(pitch) * unit) * factor
-            let back = SIMD3(Float(backPoint.x - point.x) / 10, -Float(backPoint.y - point.y) / 10,
+            let back = SIMD3(Float(backTangent.dx), -Float(backTangent.dy),
                              cos(yaw) * sin(pitch) * unit) * factor
             let up = SIMD3<Float>(0, sin(pitch), cos(pitch)) * unit * factor
             pose.transform = simd_float4x4(columns: (
@@ -635,8 +705,8 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         }
         carRenderer.submit(.init(revision: session.revision, camera: camera, size: bounds.size,
                                  controlsVisible: session.overlays.isVisible, poses: poses))
-        let animating = active && ((playbackEnabled && session.isPlaying) || cameraTransition != nil)
-        if sceneView.rendersContinuously != animating { sceneView.rendersContinuously = animating }
+        lastSyncedCamera = mapCamera.copy() as? MKMapCamera
+        updateRenderingActivity()
         #if os(macOS)
         sceneView.needsDisplay = true
         #else
@@ -647,7 +717,21 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
         guard mapView === map, !preparingCamera else { return }
         session.displayedCamera = map.camera.copy() as? MKMapCamera
-        if active { needsProjection = true; groundProjectionDirty = true }
+        guard active else { return }
+        needsProjection = true
+        groundProjectionDirty = true
+        // A gesture can move MapKit after our display-link callback. Publish its
+        // new anchors in this run-loop turn rather than waiting another frame.
+        // Coalesce callbacks; the display tick refines with the freshest camera.
+        guard !projectionScheduled else { return }
+        projectionScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.projectionScheduled = false
+            guard self.active, self.needsProjection else { return }
+            self.needsProjection = false
+            self.synchronizeScene()
+        }
     }
 
     func mapViewDidFinishRenderingMap(_ mapView: MKMapView, fullyRendered: Bool) {

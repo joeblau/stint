@@ -89,6 +89,36 @@ final class FollowCameraTests: XCTestCase {
         }
     }
 
+    @MainActor func testSwitchingFollowedDriversAnimatesOnDisplayClockWhilePaused() throws {
+        let session = RaceSession()
+        session.isPlaying = false
+        session.toggleFollow()
+        let surface = RaceMapSurface(session: session)
+        surface.frame = CGRect(x: 0, y: 0, width: 1280, height: 820)
+        surface.layout()
+        surface.displayFrame(at: 100)
+        let first = try XCTUnwrap(session.selectedDriverID)
+        let second = try XCTUnwrap(session.standings.first { $0.id != first })
+        let start = surface.map.camera.centerCoordinate
+        session.selectedDriverID = second.id
+        surface.requestUpdate()
+        surface.displayFrame(at: 101)
+        XCTAssertEqual(surface.map.camera.centerCoordinate.latitude, start.latitude, accuracy: 0.00001)
+        surface.displayFrame(at: 101.9)
+        let halfway = surface.map.camera.centerCoordinate
+        XCTAssertGreaterThan(abs(halfway.latitude - start.latitude) + abs(halfway.longitude - start.longitude), 0.000001)
+        XCTAssertTrue(surface.isRenderingContinuously)
+        surface.displayFrame(at: 103)
+        let destination = surface.map.camera.centerCoordinate
+        XCTAssertEqual(destination.latitude, second.point.latitude, accuracy: 0.00001)
+        XCTAssertEqual(destination.longitude, second.point.longitude, accuracy: 0.00001)
+        XCTAssertFalse(surface.isRenderingContinuously)
+        XCTAssertEqual(session.time, 0)
+        XCTAssertEqual(session.renderTime, 0)
+        XCTAssertFalse(session.isPlaying)
+        surface.setActive(false)
+    }
+
     @MainActor func testReduceMotionSkipsFollowTransition() {
         let session = RaceSession()
         session.isPlaying = false

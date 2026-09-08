@@ -54,6 +54,33 @@ final class OpenF1DownloadTests: XCTestCase {
         XCTAssertTrue(OpenF1Stub.requests.isEmpty)
     }
 
+    @MainActor func testDriverWithoutLocationDataIsSkippedInsteadOfFailingTheDownload() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let storage = ReplayStorage(directory: directory)
+        let openF1 = try client()
+        OpenF1Stub.add(bodies: [
+            "drivers": Data("""
+            [{"driver_number":16,"full_name":"Charles Leclerc","name_acronym":"LEC","team_colour":"E80020","team_name":"Ferrari"},
+             {"driver_number":5,"full_name":"Gabriel Bortoleto","name_acronym":"BOR","team_colour":"00E701","team_name":"Kick Sauber"}]
+            """.utf8),
+            "laps": Data("""
+            [{"driver_number":16,"lap_number":1,"date_start":"2026-06-07T13:04:37.816Z","lap_duration":78.553,"is_pit_out_lap":false},
+             {"driver_number":16,"lap_number":2,"date_start":"2026-06-07T13:04:37.816Z","lap_duration":78.553,"is_pit_out_lap":false},
+             {"driver_number":5,"lap_number":1,"date_start":"2026-06-07T13:04:37.816Z","lap_duration":80.1,"is_pit_out_lap":false}]
+            """.utf8),
+            "location?driver_number=5": Data("[]".utf8),
+        ])
+        let library = ReplayLibrary(storage: storage, downloader: RaceReplayDownloader(client: openF1))
+        let race = try XCTUnwrap(Season2026.races.first { $0.circuitID == "monaco" })
+        library.download(race)
+        try await finish(library)
+        XCTAssertNil(library.error)
+        XCTAssertTrue(library.isSaved(race))
+        let replay = try await library.load(race)
+        XCTAssertEqual(replay.recordings.map(\.driver.id), ["LEC"])
+    }
+
     @MainActor func testFailedDownloadLeavesNoSavedFileAndAllowsRetry() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -137,6 +164,9 @@ private final class OpenF1Stub: URLProtocol, @unchecked Sendable {
     private static var failingEndpoint: String?
     private static var recordedRequests: [URL] = []
     static var requests: [URL] { lock.withLock { recordedRequests } }
+    static func add(bodies extra: [String: Data]) {
+        lock.withLock { bodies.merge(extra) { _, new in new } }
+    }
     static func configure(bodies: [String: Data], failingEndpoint: String?) {
         lock.withLock {
             self.bodies = bodies
@@ -150,7 +180,9 @@ private final class OpenF1Stub: URLProtocol, @unchecked Sendable {
         let url = request.url!
         let (body, status) = Self.lock.withLock {
             Self.recordedRequests.append(url)
-            let body = Self.bodies[url.lastPathComponent]
+            // Per-driver bodies use "endpoint?driver_number=N"; plain endpoint names are the fallback.
+            let driver = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "driver_number" }?.value
+            let body = driver.flatMap { Self.bodies["\(url.lastPathComponent)?driver_number=\($0)"] } ?? Self.bodies[url.lastPathComponent]
             return (body ?? Data(), Self.failingEndpoint == url.lastPathComponent || body == nil ? 404 : 200)
         }
         client?.urlProtocol(self, didReceive: HTTPURLResponse(url: url, statusCode: status, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)

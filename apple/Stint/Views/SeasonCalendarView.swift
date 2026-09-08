@@ -137,12 +137,18 @@ struct SeasonCalendarView: View {
         if library.downloadingCircuitID == race.circuitID {
             Button { library.cancelDownload() } label: {
                 ZStack {
-                    ProgressView().controlSize(.small)
+                    Circle().stroke(.primary.opacity(0.2), lineWidth: 2)
+                    Circle()
+                        .trim(from: 0, to: min(1, max(0, library.progress)))
+                        .stroke(.primary, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: library.progress)
                     Image(systemName: "xmark").font(.system(size: 7, weight: .bold))
-                }.frame(width: 36, height: 40).contentShape(Rectangle())
+                }.frame(width: 18, height: 18)
+                    .frame(width: 36, height: 40).contentShape(Rectangle())
             }
             .accessibilityLabel("Cancel download for \(race.name)")
-            .accessibilityValue(library.progressLabel)
+            .accessibilityValue("\(Int(library.progress * 100)) percent. \(library.progressLabel)")
             .help("Cancel download")
             .accessibilityIdentifier("cancel-download-\(race.circuitID)")
         } else {
