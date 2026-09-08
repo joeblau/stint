@@ -37,10 +37,15 @@ final class StandingsColumnTests: XCTestCase {
 
         // A column chosen from the menu takes over the fourth button.
         more.tap()
-        let laps = app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Laps'")).firstMatch
-        XCTAssertTrue(laps.waitForExistence(timeout: 5))
+        let laps = app.buttons["standings-column-row-laps"]
+        XCTAssertTrue(app.buttons["standings-column-row-gap"].waitForExistence(timeout: 5))
         attach(app, name: "Standings column menu")
-        laps.tap()
+        // The popover's dismiss region makes XCUITest treat rows as covered, so drive it by coordinates.
+        let list = app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : app.tables.firstMatch
+        list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85))
+            .press(forDuration: 0.1, thenDragTo: list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15)))
+        XCTAssertTrue(laps.waitForExistence(timeout: 5))
+        laps.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertFalse(tyres.isSelected)
         XCTAssertEqual(more.value as? String, "Laps")
         attach(app, name: "Standings laps column")

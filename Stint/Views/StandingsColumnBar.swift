@@ -112,7 +112,7 @@ struct StandingsColumnList: View {
                 .foregroundStyle(.secondary)
         }
         .padding(16)
-        .frame(width: 300, height: 520)
+        .frame(width: 300, height: 660)
     }
 
     private func move(_ column: StandingsColumn, by offset: Int) {
