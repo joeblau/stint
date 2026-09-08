@@ -66,6 +66,26 @@ struct DriverRecording: Codable {
     var gridPosition: Int? = nil
     var stints: [TyreStint]? = nil
     var pitStops: [PitStop]? = nil
+    private var motion: ReplayMotion? = nil
+
+    private enum CodingKeys: String, CodingKey {
+        case driver, samples, gridPosition, stints, pitStops
+    }
+
+    init(driver: Driver, samples: [PositionSample], gridPosition: Int? = nil,
+         stints: [TyreStint]? = nil, pitStops: [PitStop]? = nil) {
+        self.driver = driver
+        self.samples = samples
+        self.gridPosition = gridPosition
+        self.stints = stints
+        self.pitStops = pitStops
+    }
+
+    func preparingMotion() -> Self {
+        var recording = self
+        recording.motion = ReplayMotion(samples: samples)
+        return recording
+    }
 
     func position(at time: Double) -> CarPosition {
         // Validated recordings always contain at least two strictly ordered samples.
@@ -78,8 +98,12 @@ struct DriverRecording: Codable {
         let a = samples[low]
         let b = samples[high]
         let fraction = min(1, max(0, (time - a.time) / (b.time - a.time)))
-        let turn = (b.heading - a.heading + 540).truncatingRemainder(dividingBy: 360) - 180
-        let heading = (a.heading + turn * fraction + 360).truncatingRemainder(dividingBy: 360)
+        let location = motion?.location(at: time, segment: low, samples: samples)
+        let spatialA = location.map { samples[$0.index] } ?? a
+        let spatialB = location.map { samples[$0.index + 1] } ?? b
+        let spatialFraction = location?.fraction ?? fraction
+        let turn = (spatialB.heading - spatialA.heading + 540).truncatingRemainder(dividingBy: 360) - 180
+        let heading = (spatialA.heading + turn * spatialFraction + 360).truncatingRemainder(dividingBy: 360)
         let speed: Double?
         if let first = a.speedKPH, let second = b.speedKPH {
             speed = first + (second - first) * fraction
@@ -94,7 +118,7 @@ struct DriverRecording: Codable {
             guard let first, let second else { return nil }
             return first + (second - first) * fraction
         }
-        return CarPosition(driver: driver, point: a.point.interpolated(to: b.point, fraction: fraction),
+        return CarPosition(driver: driver, point: spatialA.point.interpolated(to: spatialB.point, fraction: spatialFraction),
                            heading: heading, speedKPH: speed,
                            racePosition: fraction < 1 ? a.racePosition : b.racePosition, gapToLeader: gap,
                            throttle: pedal(a.throttle, b.throttle), brake: pedal(a.brake, b.brake),

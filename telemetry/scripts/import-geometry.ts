@@ -49,7 +49,15 @@ const alignment = alignClosedLoops(parsed.points, target);
 if (alignment.rms > maxRms)
   throw new Error(`Alignment RMS ${alignment.rms.toFixed(2)} m exceeds ${maxRms} m; refusing to emit misaligned geometry`);
 const {transform, reversed} = alignment;
-const transformed: Point[] = parsed.points.map(p => {
+// Densify coarse sources (GeoJSON chords reach >100 m) so emitted segments stay well under the Route 100 m limit.
+const dense: CenterlinePoint[] = [];
+for (let i = 0; i < parsed.points.length; i++) {
+  const a = parsed.points[i], b = parsed.points[(i + 1) % parsed.points.length];
+  dense.push(a);
+  const span = Math.hypot(b.x - a.x, b.y - a.y), parts = Math.ceil(span / 25);
+  for (let k = 1; k < parts; k++) dense.push({x: a.x + (b.x - a.x) * k / parts, y: a.y + (b.y - a.y) * k / parts, wr: a.wr + (b.wr - a.wr) * k / parts, wl: a.wl + (b.wl - a.wl) * k / parts});
+}
+const transformed: Point[] = dense.map(p => {
   const q = applyTransform(p, transform);
   const donor = nearestZ(q, target);
   return reversed
