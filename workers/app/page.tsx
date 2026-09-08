@@ -37,6 +37,7 @@ export default function Home() {
         <div className={styles.actions}>
           <a className={styles.primary} href="https://github.com/joeblau/stint/releases/latest/download/Stint-macOS.zip">
             Download for Mac
+            <span className={styles.primaryNote}>macOS 26+</span>
           </a>
           <span className={styles.secondaryDisabled} aria-disabled="true" title="iPad build coming soon">
             iPad · soon
