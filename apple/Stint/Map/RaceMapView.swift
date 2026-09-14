@@ -169,7 +169,6 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         sceneView.wantsLayer = true
         sceneView.layer?.isOpaque = false
         let tap = NSClickGestureRecognizer(target: self, action: #selector(selectCar(_:)))
-        let pinch = NSMagnificationGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         #else
         sceneView.accessibilityElementsHidden = true
         sceneView.isOpaque = false
@@ -178,9 +177,9 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         tap.cancelsTouchesInView = false
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         pinch.cancelsTouchesInView = false
-        #endif
         pinch.delegate = self
         map.addGestureRecognizer(pinch)
+        #endif
         map.addGestureRecognizer(tap)
         let lens = SCNCamera()
         lens.usesOrthographicProjection = true
@@ -218,7 +217,14 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         inputMonitor = NSEvent.addLocalMonitorForEvents(matching: [
             .mouseMoved, .leftMouseDown, .leftMouseDragged, .rightMouseDown, .scrollWheel, .keyDown, .magnify, .rotate
         ]) { [weak self] event in
-            if let self, event.window === self.window { self.session.overlays.reveal() }
+            if let self, event.window === self.window {
+                self.session.overlays.reveal()
+                // Observe before native dispatch; a separate AppKit magnification recognizer
+                // can consume the gesture without performing MapKit's actual zoom.
+                if event.type == .magnify {
+                    self.prepareForMapMagnification(at: event.locationInWindow)
+                }
+            }
             return event
         }
     }
@@ -769,8 +775,10 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     }
 
     #if os(macOS)
-    @objc private func handlePinch(_ gesture: NSMagnificationGestureRecognizer) {
-        if gesture.state == .began || gesture.state == .changed { beginManualZoom() }
+    func prepareForMapMagnification(at windowPoint: CGPoint) {
+        guard active, !isHiddenOrHasHiddenAncestor,
+              map.bounds.contains(map.convert(windowPoint, from: nil)) else { return }
+        beginManualZoom()
     }
     @objc private func selectCar(_ gesture: NSClickGestureRecognizer) { select(at: gesture.location(in: self)) }
     #else
@@ -919,12 +927,7 @@ private final class PassthroughMapView: MKMapView {
     #endif
 }
 
-#if os(macOS)
-extension RaceMapSurface: NSGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: NSGestureRecognizer) -> Bool { true }
-}
-#else
+#if !os(macOS)
 extension RaceMapSurface: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
                            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool { true }
