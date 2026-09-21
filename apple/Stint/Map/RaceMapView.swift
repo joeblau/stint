@@ -320,13 +320,14 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         preparingCamera = true
         let isDay = session.lightingIsDay
         if dayLighting != isDay { applyLighting(isDay: isDay) }
-        if satellite != session.satellite {
+        if sourceChanged || satellite != session.satellite {
             satellite = session.satellite
             map.showsBuildings = !session.satellite
+            let elevation = MiamiSurfacePolicy.elevation(circuitID: session.demoCircuit?.id)
             if session.satellite {
-                map.preferredConfiguration = MKImageryMapConfiguration(elevationStyle: .flat)
+                map.preferredConfiguration = MKImageryMapConfiguration(elevationStyle: elevation)
             } else {
-                let configuration = MKStandardMapConfiguration(elevationStyle: .flat, emphasisStyle: .muted)
+                let configuration = MKStandardMapConfiguration(elevationStyle: elevation, emphasisStyle: .muted)
                 configuration.pointOfInterestFilter = .excludingAll
                 map.preferredConfiguration = configuration
             }
@@ -343,17 +344,9 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
             articulationTimes.removeAll()
             articulations.removeAll()
             if let replay = session.replay {
-                if let circuitID = session.demoCircuit?.id,
-                   let surface = TrackSurfaceLibrary.shared.surface(for: circuitID) {
-                    map.addOverlay(TrackRibbonPolygon(coordinates: surface.ribbon), level: .aboveRoads)
-                    map.addOverlay(TrackEdgePolyline(coordinates: surface.leftEdge.map(\.coordinate)), level: .aboveRoads)
-                    map.addOverlay(TrackEdgePolyline(coordinates: surface.rightEdge.map(\.coordinate)), level: .aboveRoads)
-                    for kerb in surface.kerbs {
-                        map.addOverlay(KerbStripPolygon.make(coordinates: kerb.polygon, imagery: kerb.imagery), level: .aboveRoads)
-                    }
-                } else if let track = TrackSurfaceOverlay(points: replay.circuit) {
-                    map.addOverlay(track, level: .aboveRoads)
-                }
+                let circuitID = session.demoCircuit?.id
+                let edgeDocument = circuitID.flatMap { try? CircuitEdgeDocument.load(circuitID: $0) }
+                map.addOverlays(CircuitTrackOverlays.make(document: edgeDocument, circuit: replay.circuit), level: .aboveRoads)
                 for recording in replay.recordings {
                     let rig = CarGeometry.make(color: recording.driver.color)
                     let car = rig.root
@@ -382,7 +375,7 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
         }
         var destination = requestedOverview ?? (tiltChanged ? map.camera.copy() as! MKMapCamera
             : cameraTransition?.destination ?? map.camera.copy() as! MKMapCamera)
-        positions = session.replay?.recordings.map { $0.position(at: session.renderTime) } ?? []
+        positions = session.positions(at: session.renderTime)
         if session.followsDriver, let selected = positions.first(where: { $0.id == session.selectedDriverID }) {
             let elapsed = lastFollowUpdate.map { now - $0 } ?? 0
             let switchedDriver = followedDriverID != selected.id
@@ -698,14 +691,19 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
             let back = SIMD3(Float(backTangent.dx), -Float(backTangent.dy),
                              cos(yaw) * sin(pitch) * unit) * factor
             let up = SIMD3<Float>(0, sin(pitch), cos(pitch)) * unit * factor
+            // Side-by-side placement is a display offset in car units, so it scales with the
+            // exaggerated model and keeps neighbors apart at every zoom level.
+            let lateral = CGFloat(position.lateralOffset) * CGFloat(factor)
+            let drawn = CGPoint(x: point.x + rightTangent.dx * lateral, y: point.y + rightTangent.dy * lateral)
+            projectedPositions[position.id] = drawn
             pose.transform = simd_float4x4(columns: (
                 SIMD4(right, 0), SIMD4(up, 0), SIMD4(back, 0),
-                SIMD4(Float(point.x), Float(height - point.y), 0, 1)))
+                SIMD4(Float(drawn.x), Float(height - drawn.y), 0, 1)))
             pose.selected = position.id == selectedID
             pose.showLabel = showLabels
             // Keep the label above the actual model when zoomed all the way in.
             let labelOffset = max(29 * Float(carScale), unit * factor * 3.2)
-            pose.labelPosition = SIMD3(Float(point.x), Float(height - point.y) + labelOffset, 100)
+            pose.labelPosition = SIMD3(Float(drawn.x), Float(height - drawn.y) + labelOffset, 100)
             poses.append(pose)
         }
         updateCarArticulation()
@@ -755,23 +753,18 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     }
 
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        switch overlay {
-        case let track as TrackSurfaceOverlay:
-            return TrackSurfaceRenderer(track: track)
-        case let ribbon as TrackRibbonPolygon:
-            let renderer = MKPolygonRenderer(polygon: ribbon)
-            renderer.fillColor = PlatformColor(white: 0.19, alpha: 1)
+        if let asphalt = overlay as? CircuitAsphaltOverlay { return CircuitAsphaltRenderer(asphalt: asphalt) }
+        if let edge = overlay as? CircuitEdgeOverlay {
+            let renderer = CircuitEdgeRenderer(edge: edge)
+            #if os(macOS)
+            renderer.displayScale = mapView.window?.backingScaleFactor ?? 2
+            #else
+            renderer.displayScale = mapView.window?.screen.scale ?? 2
+            #endif
             return renderer
-        case let edge as TrackEdgePolyline:
-            return TrackEdgeRenderer(edge: edge)
-        case let kerb as KerbStripPolygon:
-            let renderer = MKPolygonRenderer(polygon: kerb)
-            // Imagery-verified strips are solid; curvature-synthetic strips stay translucent.
-            renderer.fillColor = PlatformColor(red: 0.72, green: 0.11, blue: 0.09, alpha: kerb.imagery ? 0.9 : 0.45)
-            return renderer
-        default:
-            return MKOverlayRenderer(overlay: overlay)
         }
+        guard let track = overlay as? TrackSurfaceOverlay else { return MKOverlayRenderer(overlay: overlay) }
+        return TrackSurfaceRenderer(track: track)
     }
 
     #if os(macOS)
@@ -809,8 +802,9 @@ final class RaceMapSurface: PlatformView, MKMapViewDelegate {
     }
 }
 
-/// Fallback for circuits without measured geometry: a uniform 12-meter surface.
-private final class TrackSurfaceOverlay: NSObject, MKOverlay {    let coordinate: CLLocationCoordinate2D
+/// The bundled paths have no surveyed widths. Start with a uniform 12-meter surface.
+final class TrackSurfaceOverlay: NSObject, MKOverlay {
+    let coordinate: CLLocationCoordinate2D
     let boundingMapRect: MKMapRect
     let points: [MKMapPoint]
     let width: CGFloat
@@ -831,7 +825,7 @@ private final class TrackSurfaceOverlay: NSObject, MKOverlay {    let coordinate
     }
 }
 
-private final class TrackSurfaceRenderer: MKOverlayRenderer {
+final class TrackSurfaceRenderer: MKOverlayRenderer {
     private let trackPath = CGMutablePath()
     private let trackWidth: CGFloat
     private let edgeWidth: CGFloat
@@ -861,60 +855,6 @@ private final class TrackSurfaceRenderer: MKOverlayRenderer {
         context.addPath(trackPath)
         context.setStrokeColor(asphalt)
         context.setLineWidth(trackWidth - 2 * edgeWidth)
-        context.strokePath()
-        context.restoreGState()
-    }
-}
-
-/// Measured asphalt ribbon from TrackSurfaceLibrary: left edge forward, right edge back, closed by MapKit.
-private final class TrackRibbonPolygon: MKPolygon {
-    convenience init(coordinates: [CLLocationCoordinate2D]) {
-        var coordinates = coordinates
-        self.init(coordinates: &coordinates, count: coordinates.count)
-    }
-}
-
-/// Measured track edge; stroked by TrackEdgeRenderer at a ground-attached physical width.
-private final class TrackEdgePolyline: MKPolyline {
-    convenience init(coordinates: [CLLocationCoordinate2D]) {
-        var coordinates = coordinates
-        self.init(coordinates: &coordinates, count: coordinates.count)
-    }
-}
-
-/// Measured kerb strip; `imagery` marks strips verified against satellite imagery.
-private final class KerbStripPolygon: MKPolygon {
-    private(set) var imagery = false
-
-    static func make(coordinates: [CLLocationCoordinate2D], imagery: Bool) -> KerbStripPolygon {
-        var coordinates = coordinates
-        let polygon = KerbStripPolygon(coordinates: &coordinates, count: coordinates.count)
-        polygon.imagery = imagery
-        return polygon
-    }
-}
-
-/// Strokes a measured edge like TrackSurfaceRenderer does: map-space width stays attached to the
-/// ground as the camera zooms or tilts, instead of a fixed screen-point lineWidth.
-private final class TrackEdgeRenderer: MKOverlayRenderer {
-    private let edgePath = CGMutablePath()
-    private let lineWidth: CGFloat
-    private let color = CGColor(gray: 0.87, alpha: 1)
-
-    init(edge: TrackEdgePolyline) {
-        lineWidth = 0.25 * MKMapPointsPerMeterAtLatitude(edge.coordinate.latitude)
-        super.init(overlay: edge)
-        for index in 0..<edge.pointCount {
-            let local = point(for: edge.points()[index])
-            if index == 0 { edgePath.move(to: local) } else { edgePath.addLine(to: local) }
-        }
-    }
-
-    override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
-        context.saveGState()
-        context.addPath(edgePath)
-        context.setStrokeColor(color)
-        context.setLineWidth(lineWidth)
         context.strokePath()
         context.restoreGState()
     }

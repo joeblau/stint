@@ -1,0 +1,19 @@
+{
+ "id": "catalunya",
+ "imageryZoom": 18,
+ "imageryZooms": {
+  "18": 74
+ },
+ "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+ "imageryTiles": 74,
+ "widthProvenance": "tumftm-satellite",
+ "kerbProvenance": "mixed",
+ "kerbStrips": 32,
+ "measuredWidthRangeM": [
+  7,
+  29.5
+ ],
+ "pctMeasured": 87.6,
+ "imageryMeasuredAt": "2026-09-08T08:01:29.063Z",
+ "imageryNotes": "WIDTHS REVERTED TO TUMFTM PRIORS - imagery measurement attempted and rejected. Imagery measurement 2026-09-08T08:01:29.063Z: 74 tiles, mosaic 2560x3072 px, zoom 18 (~0.45 m/px at track latitude). 87.6% of 939 stations measured at confidence>=0.45 (163 continuity-guided), 60 interpolated over <=60 m bridges, 56 fell back to prior widths (64 dark/shadow-suspect stations). Measured full-width range 7.0-29.5 m (median 16.8 m). TUMFTM cross-validation over 823 measured stations: Pearson r=0.148, mean |\u0394 full width|=6.87 m. Kerbs: 3/22 strips imagery-detected. QA review: TUMFTM cross-validation (genuine, first run) shows systematic paved-corridor bias \u2014 measured edges sit OUTSIDE the red/white kerbs and white edge lines on most of the lap (MAD 6.86 m, bias +6.56 m, r=0.147, 68% of measured stations >4 m wider than TUMFTM). Widths are paved-corridor estimates; treat as low-confidence for racing width. Final-corner complex (route points ~815-870) is unusable: widths swing 7.0-29.5 m where old-chicane and current sweeper pavements overlap. Kerb detections at corners 4-5 are solid (red fraction 21-37%, runs 30-55 m). Resolution: TUMFTM satellite-derived widths restored via build-track-library rebuild on 2026-09-08; widthProvenance stays tumftm-satellite; QA render retained as documentation. Kerbs 3/32 imagery-detected (retained from the imagery run; see kerbs file)."
+}

@@ -16,7 +16,10 @@ final class TrackFlyoverTests: XCTestCase {
         let pass = try flyover()
         let start = MKMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 43.7, longitude: 7.4),
                                 fromDistance: 300_000, pitch: 0, heading: 0)
-        XCTAssertEqual(pass.duration, 31.5, accuracy: 0.001)
+        XCTAssertEqual(pass.lapDuration, pass.route.length / 20, accuracy: 0.001)
+        XCTAssertGreaterThan(pass.lapDuration, 150, "The lap should be scenic, not race pace")
+        XCTAssertLessThanOrEqual(TrackFlyover.chaseDistance, 10)
+        XCTAssertEqual(TrackFlyover.chasePitch, 55)
         let opening = pass.camera(at: 0, from: start)
         XCTAssertEqual(opening.centerCoordinateDistance, 300_000, accuracy: 1)
         XCTAssertEqual(opening.pitch, 0, accuracy: 0.01)
@@ -24,7 +27,7 @@ final class TrackFlyoverTests: XCTestCase {
         XCTAssertEqual(settled.pitch, TrackFlyover.overviewPitch, accuracy: 0.5)
         XCTAssertLessThan(meters(settled.centerCoordinate, pass.center), 50)
         XCTAssertGreaterThan(settled.centerCoordinateDistance, 2_900)
-        let midLap = pass.camera(at: TrackFlyover.settleDuration + TrackFlyover.lapDuration / 2, from: start)
+        let midLap = pass.camera(at: TrackFlyover.settleDuration + pass.lapDuration / 2, from: start)
         XCTAssertEqual(midLap.centerCoordinateDistance, TrackFlyover.chaseDistance, accuracy: 1)
         XCTAssertEqual(midLap.pitch, TrackFlyover.chasePitch, accuracy: 0.5)
         let onTrack = pass.route.points.contains { meters($0.coordinate, midLap.centerCoordinate) < 30 }
@@ -44,4 +47,16 @@ final class TrackFlyoverTests: XCTestCase {
             previous = heading
         }
     }
+    func testLongerCircuitsKeepTheSameScenicSpeed() throws {
+        let monaco = try flyover()
+        let miami = try flyover("miami")
+        XCTAssertGreaterThan(miami.lapDuration, monaco.lapDuration)
+        for pass in [monaco, miami] {
+            XCTAssertEqual(pass.route.length / pass.lapDuration * 3.6, 72, accuracy: 0.001)
+            let a = pass.chaseCamera(atLap: 0.2)
+            let b = pass.chaseCamera(atLap: 0.2 + 1 / pass.lapDuration)
+            XCTAssertLessThan(meters(a.centerCoordinate, b.centerCoordinate), 21)
+        }
+    }
+
 }

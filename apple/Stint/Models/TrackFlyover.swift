@@ -1,6 +1,15 @@
 import Foundation
 import MapKit
 
+/// A scrub request from the calendar card's flyover slider: jump the running pass to
+/// `fraction` (0...1) of its total duration. Each drag creates a fresh token.
+struct FlyoverScrub {
+    let id = UUID()
+    let fraction: Double
+
+    init(_ fraction: Double) { self.fraction = fraction }
+}
+
 /// A cinematic pass over a circuit: settle above the track, one low chase lap along the
 /// centerline, then pull back to a three-quarter view. Pure timing math; the globe drives the map.
 struct TrackFlyover {
@@ -9,18 +18,21 @@ struct TrackFlyover {
     let overviewDistance: Double
 
     static let settleDuration = 2.5
-    static let lapDuration = 24.0
+    static let speedMetersPerSecond = 20.0
+    var lapDuration: Double { route.length / Self.speedMetersPerSecond }
     static let pullbackDuration = 5.0
-    /// Low and slow: a few hundred meters up, looking well down the track.
-    static let chaseDistance = 320.0
-    static let chasePitch = 68.0
+    /// Request the closest, lowest supported perspective. MapKit clamps the actual
+    /// distance and pitch to the terrain and imagery available at each location.
+    static let chaseDistance = FollowCamera.chaseDistance
+    /// MapKit measures pitch from overhead: 55° looks 35° down toward the track.
+    static let chasePitch = 55.0
     static let overviewPitch = 45.0
-    static let lookahead = 120.0
+    static let lookahead = 35.0
     static let blendDuration = 3.0
     /// Heading is the mean of unwrapped bearings over this stretch, so hairpins turn the camera gradually.
     static let headingWindow = 400.0
 
-    var duration: Double { Self.settleDuration + Self.lapDuration + Self.pullbackDuration }
+    var duration: Double { Self.settleDuration + lapDuration + Self.pullbackDuration }
 
     init(circuit: [GeoPoint]) {
         var points = circuit
@@ -85,15 +97,15 @@ struct TrackFlyover {
             return MapFlight.camera(from: start, to: overviewCamera, progress: t / Self.settleDuration)
         }
         let lapTime = t - Self.settleDuration
-        if lapTime < Self.lapDuration {
-            let chase = chaseCamera(atLap: lapTime / Self.lapDuration)
+        if lapTime < lapDuration {
+            let chase = chaseCamera(atLap: lapTime / lapDuration)
             // Blend from the overview into the chase so the first corner does not cut.
             if lapTime < Self.blendDuration {
                 return MapFlight.camera(from: overviewCamera, to: chase, progress: lapTime / Self.blendDuration)
             }
             return chase
         }
-        let pullback = (lapTime - Self.lapDuration) / Self.pullbackDuration
+        let pullback = (lapTime - lapDuration) / Self.pullbackDuration
         return MapFlight.camera(from: chaseCamera(atLap: 1), to: finalCamera, progress: pullback)
     }
 }

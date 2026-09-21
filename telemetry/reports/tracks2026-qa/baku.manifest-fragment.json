@@ -1,0 +1,19 @@
+{
+ "id": "baku",
+ "imageryZoom": 18,
+ "imageryZooms": {
+  "18": 109
+ },
+ "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+ "imageryTiles": 109,
+ "widthProvenance": "esri-imagery+default-fallback",
+ "kerbProvenance": "synthetic",
+ "kerbStrips": 24,
+ "measuredWidthRangeM": [
+  10.5,
+  29.5
+ ],
+ "pctMeasured": 58.2,
+ "imageryMeasuredAt": "2026-09-08T07:38:49.758Z",
+ "imageryNotes": "Imagery measurement 2026-09-08T07:38:49.758Z: 109 tiles, mosaic 4864x3840 px, zoom 18 (~0.45 m/px at track latitude). 58.2% of 1190 stations measured at confidence>=0.45 (266 continuity-guided), 352 interpolated over <=60 m bridges, 145 fell back to prior widths (350 dark/shadow-suspect stations). Measured full-width range 10.5-29.5 m (median 21.5 m). Kerbs: 0/24 strips imagery-detected. Reviewer note: the ~7.6 m old-town castle pinch (T8-T10) was NOT confidently measured (deep building shadow in imagery); prior widths are retained there \u2014 treat the 10.5 m measured minimum as not covering the pinch. Boulevard fallbacks are likewise shadow-driven and keep prior widths by design. MANUAL OVERRIDE applied 2026-09-08: castle-section span (route points 124-150, arc ~2613-3099 m, approx turns 8-12) set to 8.0 m full width (4.0 m halves) as a documented manual estimate - the publicly documented ~7.6 m pinch was shadowed in imagery and unmeasurable; prior 10 m constant widths had been retained there. widthProvenance downgraded to esri-imagery+default-fallback accordingly."
+}

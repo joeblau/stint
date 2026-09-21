@@ -1,0 +1,20 @@
+{
+ "id": "montreal",
+ "imageryZoom": 19,
+ "imageryZooms": {
+  "18": 17,
+  "19": 275
+ },
+ "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+ "imageryTiles": 292,
+ "widthProvenance": "tumftm-satellite",
+ "kerbProvenance": "synthetic",
+ "kerbStrips": 14,
+ "measuredWidthRangeM": [
+  8.25,
+  26.5
+ ],
+ "pctMeasured": 85.2,
+ "imageryMeasuredAt": "2026-09-08T08:05:00.358Z",
+ "imageryNotes": "WIDTHS REVERTED TO TUMFTM PRIORS - imagery measurement attempted and rejected. Imagery measurement 2026-09-08T08:05:00.358Z: 292 tiles, mosaic 3840x9984 px, zoom 19 (fallbacks: {\"18\":17,\"19\":275}) (~0.21 m/px at track latitude). 85.2% of 873 stations measured at confidence>=0.45 (154 continuity-guided), 129 interpolated over <=60 m bridges, 0 fell back to prior widths (3 dark/shadow-suspect stations). Measured full-width range 8.3-26.5 m (median 15.8 m). NOTE: the automatic cross-validation above compared against the previous z18 measurement (re-run contamination), not TUMFTM. Independent check against reference/tumftm-Montreal.csv by arc-length: MAD 6.16 m, bias +6.14 m, r=0.336, 71.6% of measured stations >4 m wider than TUMFTM \u2014 the detector locks onto the full paved corridor (asphalt + paved shoulders/aprons) on this park-road circuit, not the marked racing corridor. Widths are paved-corridor estimates; treat as low-confidence for racing width.  Kerbs: 0/12 strips imagery-detected. Resolution: TUMFTM satellite-derived widths restored via build-track-library rebuild on 2026-09-08; widthProvenance stays tumftm-satellite; QA render retained as documentation. Kerbs 0/14 imagery-detected (synthetic)."
+}

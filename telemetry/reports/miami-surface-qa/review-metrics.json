@@ -1,0 +1,17 @@
+{
+  "roadPolygons": 1,
+  "infieldHoles": 1,
+  "centerlineStations": 5432,
+  "fullDenseCenterlineCovered": true,
+  "reviewedTurns": 19,
+  "reviewedKerbStrips": 25,
+  "kerbLineStrings": 26,
+  "widthRangeM": [
+    9.096960402385374,
+    20.087725524973706
+  ],
+  "maxSideWidthStepM": 0.4039376281352638,
+  "displayToVisiblePaintOffsetP95M": 0.34189344994502097,
+  "displayToVisiblePaintOffsetMaxM": 1.1640368749397894,
+  "note": "Paint-offset residual describes smoothing against image samples, not absolute positional accuracy. All geographic kerbs remain low confidence."
+}

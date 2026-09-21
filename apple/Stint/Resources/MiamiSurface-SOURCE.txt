@@ -1,0 +1,25 @@
+Miami track surface and reviewed kerb strips
+
+Imagery: Miami-Dade County | GIS Groups
+https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer
+County GIS data is offered "For Public Use", as-is, for illustration rather than surveying.
+https://www.arcgis.com/home/item.html?id=df9bba0031c0453da91ef55371c697f2
+The service advertises 2025 imagery while other metadata says 2024; exact capture date is unknown.
+
+Centerline: Tomislav Bacinger / f1-circuits, MIT (see Circuit-LICENSE.txt).
+Timing: FIA 2026 Miami GP document 5, circuit map, page 2, issued April 30, 2026.
+Timing symbols are registered to the community centerline; geographic placement is approximate.
+
+Widths are independently smoothed from reliable imagery boundaries. Obscured or weak
+sections are interpolated for a continuous visualization; inferred stations are recorded.
+Inside offsets are constrained by bend radius to prevent folded geometry.
+All 19 turns were reviewed; 25 entry/apex/exit kerb strips are retained.
+Presence and side were checked against FORMULA 1’s official 2026 Miami pole lap:
+https://www.youtube.com/watch?v=7pGVugNI59c
+Geographic positions come from county imagery, with bridge/shadow positions interpolated.
+Endpoints have approximate 8 m uncertainty; pixel support is not positional accuracy.
+The requested red/white livery is illustrative; the onboard shows orange/white.
+No video or frames are bundled.
+No kerb height, physical kerb width, surveyed accuracy, or TUMFTM validation is claimed.
+All coordinates are WGS84 longitude/latitude, without elevation.
+Full acquisition, alignment, timing and observation provenance is in miami.surface.geojson.

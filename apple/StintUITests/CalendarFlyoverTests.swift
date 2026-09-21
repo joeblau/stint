@@ -4,7 +4,7 @@ final class CalendarFlyoverTests: XCTestCase {
     /// A pin click only selects the venue; a second click on it flies over the circuit.
     @MainActor func testPinClicksSelectThenFlyOverTheCircuit() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-hud-auto-hide", "0"]
+        app.launchArguments += ["-hud-auto-hide", "0", "-onboarding-completed", "YES"]
         app.launchEnvironment["STINT_FORCE_FLIGHT"] = "1"
         app.launch()
         #if os(macOS)
@@ -45,9 +45,38 @@ final class CalendarFlyoverTests: XCTestCase {
         attach(app, name: "Fly-over settling above Monaco")
         sleep(8)
         attach(app, name: "Fly-over chase lap at Monaco")
-        sleep(19)
-        attach(app, name: "Fly-over pulled back over Monaco")
-        XCTAssertFalse(app.buttons.matching(flying).firstMatch.exists, "The pass ends on its own")
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.5))
+        let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.6))
+        from.press(forDuration: 0.1, thenDragTo: to)
+        sleep(2)
+        attach(app, name: "Manual exploration after fly-over drag")
+    }
+
+    @MainActor func testCardFlyoverButtonStartsALowSlowPass() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-hud-auto-hide", "0", "-onboarding-completed", "YES"]
+        app.launchEnvironment["STINT_FORCE_FLIGHT"] = "1"
+        app.launch()
+        XCTAssertTrue(app.buttons["tab-calendar"].waitForExistence(timeout: 15))
+        press(app.buttons["tab-calendar"])
+        let race = app.buttons["calendar-race-monaco"]
+        XCTAssertTrue(race.waitForExistence(timeout: 10))
+        press(race)
+        let button = app.buttons["flyover-circuit"]
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        XCTAssertTrue(button.isHittable)
+        XCTAssertTrue(app.sliders["flyover-scrub"].exists)
+        XCTAssertTrue(app.buttons["flyover-loop"].exists)
+        XCTAssertLessThan(button.frame.maxY, app.buttons["open-calendar-race"].frame.minY)
+        attach(app, name: "Flyover button above replay")
+        press(button)
+        sleep(10)
+        attach(app, name: "Low scenic flyover from card")
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.5))
+        let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.8, dy: 0.6))
+        from.press(forDuration: 0.1, thenDragTo: to)
+        sleep(2)
+        attach(app, name: "Free camera after dragging")
     }
 
     /// Camera moves animate for a few seconds; tap only once the pin stops moving.

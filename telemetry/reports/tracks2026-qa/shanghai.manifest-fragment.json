@@ -1,0 +1,19 @@
+{
+  "id": "shanghai",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 69
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 69,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 22,
+  "measuredWidthRangeM": [
+    8,
+    29
+  ],
+  "pctMeasured": 95.9,
+  "imageryMeasuredAt": "2026-09-08T07:41:14.379Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T07:41:14.379Z: 69 tiles, mosaic 2816x2560 px, zoom 18 (~0.51 m/px at track latitude). 95.9% of 1093 stations measured at confidence>=0.45 (103 continuity-guided), 45 interpolated over <=60 m bridges, 0 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 8.0-29.0 m (median 14.3 m). TUMFTM cross-validation over 1048 measured stations: Pearson r=0.242, mean |Δ full width|=2.37 m. Kerbs: 0/22 strips imagery-detected."
+}

@@ -33,7 +33,10 @@ struct RaceTiming {
     }
 
     struct DriverTiming {
-        let progress: [(time: Double, distance: Double)]
+        /// Track progress per sample: cumulative distance, and the signed offset across the track
+        /// (positive to the right of the circuit's direction). Playback compares offsets between
+        /// cars to tell the pit lane from the track; single values carry alignment error.
+        let progress: [(time: Double, distance: Double, lateral: Double)]
         let laps: [Lap]
         let crossings: [(index: Int, time: Double)]   // every sector boundary, in order
         let sectorRecords: [SectorRecord]
@@ -43,10 +46,15 @@ struct RaceTiming {
         let stints: [TyreStint]
         let pitStops: [PitStop]
 
-        func distance(at time: Double) -> Double {
+        func distance(at time: Double) -> Double { interpolated(at: time, \.distance) }
+
+        /// Signed offset across the track at `time`; see `progress`.
+        func lateral(at time: Double) -> Double { interpolated(at: time, \.lateral) }
+
+        private func interpolated(at time: Double, _ value: (Element) -> Double) -> Double {
             guard let first = progress.first else { return 0 }
-            if time <= first.time { return first.distance }
-            if let last = progress.last, time >= last.time { return last.distance }
+            if time <= first.time { return value(first) }
+            if let last = progress.last, time >= last.time { return value(last) }
             var low = 0
             var high = progress.count - 1
             while low + 1 < high {
@@ -56,8 +64,9 @@ struct RaceTiming {
             let a = progress[low]
             let b = progress[high]
             let fraction = (time - a.time) / max(0.0001, b.time - a.time)
-            return a.distance + (b.distance - a.distance) * fraction
+            return value(a) + (value(b) - value(a)) * fraction
         }
+        private typealias Element = (time: Double, distance: Double, lateral: Double)
 
         /// When this car first reached `distance`, or nil if it never has.
         func time(reaching distance: Double) -> Double? {
@@ -130,7 +139,7 @@ struct RaceTiming {
     private static func derive(_ recording: DriverRecording, route: CircuitRoute) -> DriverTiming {
         let length = route.length
         let sector = length / Double(sectorCount)
-        var progress: [(time: Double, distance: Double)] = []
+        var progress: [(time: Double, distance: Double, lateral: Double)] = []
         progress.reserveCapacity(recording.samples.count)
         var lapIndex = 0
         var previousTrack: Double?
@@ -146,7 +155,7 @@ struct RaceTiming {
                 lapIndex = projected.distance > length / 2 ? -1 : 0
             }
             previousTrack = projected.distance
-            progress.append((sample.time, Double(lapIndex) * length + projected.distance))
+            progress.append((sample.time, Double(lapIndex) * length + projected.distance, projected.lateral))
         }
 
         // Every sector boundary this car crossed, interpolated between the surrounding samples.
@@ -311,16 +320,17 @@ struct RaceTiming {
 }
 
 extension CircuitRoute {
-    /// The distance along the route of the point nearest to `point`. `hint` limits the search to
-    /// segments near the previous match; a full search runs when the match is poor.
-    func project(_ point: GeoPoint, hint: Int?, window: Int = 40) -> (distance: Double, index: Int) {
+    /// The distance along the route of the point nearest to `point`, with the signed offset of
+    /// `point` across the route (positive to the right of the route's direction). `hint` limits the
+    /// search to segments near the previous match; a full search runs when the match is poor.
+    func project(_ point: GeoPoint, hint: Int?, window: Int = 40) -> (distance: Double, index: Int, lateral: Double) {
         let segments = points.count - 1
-        guard segments > 0 else { return (0, 0) }
+        guard segments > 0 else { return (0, 0, 0) }
         let scale = cos(point.latitude * .pi / 180) * 111_320
         func local(_ p: GeoPoint) -> (x: Double, y: Double) {
             ((p.longitude - point.longitude) * scale, (p.latitude - point.latitude) * 111_320)
         }
-        var best = (squared: Double.infinity, distance: 0.0, index: 0)
+        var best = (squared: Double.infinity, distance: 0.0, index: 0, lateral: 0.0)
         func consider(_ i: Int) {
             let a = local(points[i])
             let b = local(points[i + 1])
@@ -331,13 +341,17 @@ extension CircuitRoute {
             let px = a.x + dx * t
             let py = a.y + dy * t
             let squared = px * px + py * py
-            if squared < best.squared { best = (squared, distances[i] + sqrt(lengthSquared) * t, i) }
+            if squared < best.squared {
+                // The query point sits at the origin, so (px, py) points from it to the route.
+                let lateral = lengthSquared > 0 ? (dx * py - dy * px) / sqrt(lengthSquared) : 0
+                best = (squared, distances[i] + sqrt(lengthSquared) * t, i, lateral)
+            }
         }
         if let hint {
             for offset in -window...window { consider(((hint + offset) % segments + segments) % segments) }
-            if best.squared < 60 * 60 { return (best.distance, best.index) }
+            if best.squared < 60 * 60 { return (best.distance, best.index, best.lateral) }
         }
         for i in 0..<segments { consider(i) }
-        return (best.distance, best.index)
+        return (best.distance, best.index, best.lateral)
     }
 }

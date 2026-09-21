@@ -12,6 +12,12 @@ struct SeasonCalendarView: View {
     @State private var month = Season2026.nextRace(at: Date())?.startMonth ?? 12
     @State private var overviewRequest = UUID()
     @State private var flyoverRequest = UUID()
+    @State private var flyoverScrub: FlyoverScrub?
+    @State private var flyoverPosition: Double = 0
+    @State private var flyoverActive = false
+    @State private var flyoverPaused = false
+    @State private var flyoverLoop = false
+    @State private var flyoverScrubbing = false
 
     private var selection: SeasonRace? { Season2026.races.first { $0.id == selected } }
 
@@ -20,7 +26,16 @@ struct SeasonCalendarView: View {
             GeometryReader { geometry in
                 let compact = geometry.size.width < 800
                 ZStack {
-                    SeasonGlobeView(active: active, flight: flight, onFlightComplete: onFlightComplete, selected: selected, overviewRequest: overviewRequest, flyoverRequest: flyoverRequest, now: timeline.date) { race in
+                    SeasonGlobeView(active: active, flight: flight, onFlightComplete: onFlightComplete, selected: selected, overviewRequest: overviewRequest, flyoverRequest: flyoverRequest, flyoverScrub: flyoverScrub, flyoverPaused: flyoverPaused, flyoverLoop: flyoverLoop, onFlyoverProgress: { progress in
+                        if let progress {
+                            flyoverActive = true
+                            if !flyoverScrubbing { flyoverPosition = progress }
+                        } else {
+                            flyoverActive = false
+                            flyoverPaused = false
+                            flyoverPosition = 0
+                        }
+                    }, now: timeline.date) { race in
                         select(race)
                     }
                     .ignoresSafeArea()
@@ -251,23 +266,55 @@ struct SeasonCalendarView: View {
                     .accessibilityLabel("Flight from \(previous.cityName): \(Int(leg.distanceKm.rounded())) kilometers, \(leg.durationLabel)")
                     .accessibilityIdentifier("calendar-flight-leg")
             }
-            Button { flyoverRequest = UUID() } label: {
-                HStack {
-                    Label("Fly over circuit", systemImage: "video")
-                    Spacer()
-                    Image(systemName: "play.fill").font(.system(size: 10, weight: .semibold))
+            HStack(spacing: 10) {
+                Button {
+                    if flyoverActive { flyoverPaused.toggle() }
+                    else {
+                        flyoverPaused = false
+                        flyoverRequest = UUID()
+                        if flyoverPosition > 0 { flyoverScrub = FlyoverScrub(flyoverPosition) }
+                    }
+                } label: {
+                    Image(systemName: flyoverActive && !flyoverPaused ? "pause.fill" : "play.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(StintPalette.white)
+                        .frame(width: 28, height: 28)
+                        .background(StintPalette.red, in: Circle())
+                        .contentShape(Circle())
                 }
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.primary)
-                .padding(12)
-                .frame(maxWidth: .infinity)
-                .background(.primary.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.primary.opacity(0.2), lineWidth: 1))
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("flyover-circuit")
+                .accessibilityLabel(flyoverActive && !flyoverPaused ? "Pause flyover" : "Fly over circuit")
+                Slider(value: Binding(
+                    get: { flyoverPosition },
+                    set: { value in
+                        flyoverPosition = value
+                        if flyoverActive { flyoverScrub = FlyoverScrub(value) }
+                    }), in: 0...1) { editing in
+                    flyoverScrubbing = editing
+                }
+                .tint(StintPalette.red)
+                .accessibilityIdentifier("flyover-scrub")
+                .accessibilityLabel("Flyover progress")
+                Button { flyoverLoop.toggle() } label: {
+                    Image(systemName: "repeat")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(flyoverLoop ? StintPalette.red : .secondary)
+                        .frame(width: 24, height: 24)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("flyover-loop")
+                .accessibilityLabel("Loop flyover")
+                .accessibilityValue(flyoverLoop ? "On" : "Off")
+                .accessibilityAddTraits(flyoverLoop ? .isSelected : [])
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("flyover-circuit")
-            .help("Take a low, slow lap of the circuit. Drag, pinch, or rotate to explore freely.")
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(.primary.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.primary.opacity(0.2), lineWidth: 1))
+            .accessibilityElement(children: .contain)
+            .help("Take a low, slow lap of the circuit. Drag the slider to scrub, repeat to loop.")
             Button { onOpenRace(race.circuit) } label: {
                 HStack {
                     Text(library.isSaved(race) ? "Play saved replay" : "Open race")

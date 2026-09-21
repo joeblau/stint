@@ -1,0 +1,83 @@
+{
+  "lines": [
+    {
+      "id": "finish",
+      "coordinates": [
+        [
+          -80.23850629723401,
+          25.960077715839777
+        ],
+        [
+          -80.2388829740589,
+          25.95954703572396
+        ]
+      ]
+    },
+    {
+      "id": "s1",
+      "coordinates": [
+        [
+          -80.24311995786269,
+          25.956362525094242
+        ],
+        [
+          -80.24328208969806,
+          25.955749656755692
+        ]
+      ]
+    },
+    {
+      "id": "s2",
+      "coordinates": [
+        [
+          -80.23069032751624,
+          25.960457412961897
+        ],
+        [
+          -80.23071817912833,
+          25.95982683015266
+        ]
+      ]
+    }
+  ],
+  "registrationRmsM": 1.1346973035551728,
+  "referenceToDiagram": [
+    0.3352726901375178,
+    0.20990640244944658,
+    298.88115452944294,
+    -474.7476761191835
+  ],
+  "diagramLineEndpointsPt": {
+    "finish": [
+      [
+        216.3,
+        406.5
+      ],
+      [
+        216.18,
+        420.36
+      ]
+    ],
+    "s1": [
+      [
+        150.57,
+        641.73
+      ],
+      [
+        155.01,
+        654.87
+      ]
+    ],
+    "s2": [
+      [
+        473.22,
+        227.22
+      ],
+      [
+        480.12,
+        239.28
+      ]
+    ]
+  },
+  "note": "Timing line axes read from official PDF vector symbols; registered by robust similarity fit of diagram road medial axis to bacinger centerline. Geographic placement is approximate, not surveyed. Road polygon from PDF is used only for timing registration, never for surface widths."
+}

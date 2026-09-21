@@ -1,0 +1,903 @@
+{
+  "version": 1,
+  "generated": "2026-09-08T08:35:25.270Z",
+  "note": "2026 F1 season track library (24 circuits from the original calendar, including cancelled Bahrain and Saudi Arabia). Standalone per-circuit geometry: local meter frame + per-point WGS84. Widths satellite-derived where TUMFTM-sourced, constant defaults elsewhere; kerbs synthetic; z = 0; all verified: false.",
+  "circuits": [
+    {
+      "id": "melbourne",
+      "name": "Albert Park Circuit",
+      "country": "Australia",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/au-1953.geojson",
+          "sha256": "a686ec41ebbc1ca6f9c8e24c2c4bd0a2e1743d0cff730aaa26479059abd99ee5",
+          "cache": "bacinger-au-1953.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Melbourne.csv",
+          "sha256": "f9ea4395a25dc4189d8b8c692ce9656682de62ad7b784dfd7c024ac8d4f245e9",
+          "cache": "tumftm-Melbourne.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 4.074,
+      "lengthM": 5317,
+      "points": 1060,
+      "confidence": 0.73,
+      "kerbStrips": 26,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 106
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 106,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        9.25,
+        25
+      ],
+      "pctMeasured": 80.1,
+      "imageryMeasuredAt": "2026-09-08T07:38:04.253Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:38:04.253Z: 106 tiles, mosaic 3584x4352 px, zoom 18 (~0.47 m/px at track latitude). 80.1% of 1063 stations measured at confidence>=0.45 (153 continuity-guided), 212 interpolated over <=60 m bridges, 0 fell back to prior widths (10 dark/shadow-suspect stations). Measured full-width range 9.3-25.0 m (median 15.8 m). TUMFTM cross-validation over 851 measured stations: Pearson r=-0.005, mean |Δ full width|=4.12 m. Kerbs: 0/26 strips imagery-detected."
+    },
+    {
+      "id": "shanghai",
+      "name": "Shanghai International Circuit",
+      "country": "China",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/cn-2004.geojson",
+          "sha256": "5cbf74478ccf3422dcc8085adde5582d9a393b572b5a038ecb5c9d80d0f8baa7",
+          "cache": "bacinger-cn-2004.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Shanghai.csv",
+          "sha256": "3bef7580e6ec9f8e2daac23445c4c81ae23e13aa6b92e4204281e143eabee277",
+          "cache": "tumftm-Shanghai.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 1.672,
+      "lengthM": 5466,
+      "points": 1090,
+      "confidence": 0.8,
+      "kerbStrips": 22,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 69
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 69,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        8,
+        29
+      ],
+      "pctMeasured": 95.9,
+      "imageryMeasuredAt": "2026-09-08T07:41:14.379Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:41:14.379Z: 69 tiles, mosaic 2816x2560 px, zoom 18 (~0.51 m/px at track latitude). 95.9% of 1093 stations measured at confidence>=0.45 (103 continuity-guided), 45 interpolated over <=60 m bridges, 0 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 8.0-29.0 m (median 14.3 m). TUMFTM cross-validation over 1048 measured stations: Pearson r=0.242, mean |Δ full width|=2.37 m. Kerbs: 0/22 strips imagery-detected."
+    },
+    {
+      "id": "suzuka",
+      "name": "Suzuka International Racing Course",
+      "country": "Japan",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/jp-1962.geojson",
+          "sha256": "14419e615c3805ac74547de107ddb46872be0697bf279e2254130d495f086eee",
+          "cache": "bacinger-jp-1962.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Suzuka.csv",
+          "sha256": "b4d3e325edd1e85e4e73765a80f7203b741e6dff5cceec4260390716c10eee67",
+          "cache": "tumftm-Suzuka.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 1.404,
+      "lengthM": 5804,
+      "points": 1161,
+      "confidence": 0.8,
+      "kerbStrips": 26,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 84
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 84,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        8,
+        27.75
+      ],
+      "pctMeasured": 81.1,
+      "imageryMeasuredAt": "2026-09-08T06:55:19.123Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T06:55:19.123Z: 84 tiles, mosaic 4608x2816 px, zoom 18 (~0.49 m/px at track latitude). 81.1% of 1161 stations measured at confidence>=0.45 (113 continuity-guided), 188 interpolated over <=60 m bridges, 31 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 8.0-27.8 m (median 14.5 m). TUMFTM cross-validation over 942 measured stations: Pearson r=0.469, mean |Δ full width|=5.42 m. Kerbs: 0/26 strips imagery-detected."
+    },
+    {
+      "id": "sakhir",
+      "name": "Bahrain International Circuit",
+      "country": "Bahrain",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/bh-2002.geojson",
+          "sha256": "6bac0f8f1f870faedb0cda06f04f6de3e98445d5b27f32c351bdddae105c3864",
+          "cache": "bacinger-bh-2002.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Sakhir.csv",
+          "sha256": "bc3c23da42f9474dbf5700341037bb45521acaa2ad1389bd0a48540fe179ee7a",
+          "cache": "tumftm-Sakhir.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 2.568,
+      "lengthM": 5404,
+      "points": 1082,
+      "confidence": 0.77,
+      "kerbStrips": 24,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 63
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 63,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        8,
+        26
+      ],
+      "pctMeasured": 97.7,
+      "imageryMeasuredAt": "2026-09-08T07:43:38.824Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:43:38.824Z: 63 tiles, mosaic 1792x2816 px, zoom 18 (~0.54 m/px at track latitude). 97.7% of 1081 stations measured at confidence>=0.45 (100 continuity-guided), 25 interpolated over <=60 m bridges, 0 fell back to prior widths (2 dark/shadow-suspect stations). Measured full-width range 8.0-26.0 m (median 14.3 m). TUMFTM cross-validation over 1056 measured stations: Pearson r=0.401, mean |Δ full width|=2.29 m. Kerbs: 0/24 strips imagery-detected."
+    },
+    {
+      "id": "jeddah",
+      "name": "Jeddah Corniche Circuit",
+      "country": "Saudi Arabia",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/sa-2021.geojson",
+          "sha256": "4500c0f47b9329cc9359d75a397b39c00e4646a318d5c54edbf30d28d59b5df5",
+          "cache": "bacinger-sa-2021.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "12 m FIA-minimum nominal width. Cancelled in the 2026 calendar reshuffle; kept for the full original roster.",
+      "alignmentRms": 0,
+      "lengthM": 6203,
+      "points": 323,
+      "confidence": 0.8,
+      "kerbStrips": 24,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 65
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 65,
+      "kerbProvenance": "mixed",
+      "measuredWidthRangeM": [
+        9.5,
+        27
+      ],
+      "pctMeasured": 86.1,
+      "imageryMeasuredAt": "2026-09-08T07:37:50.892Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:37:50.892Z: 65 tiles, mosaic 1536x5376 px, zoom 18 (~0.56 m/px at track latitude). 86.1% of 1241 stations measured at confidence>=0.45 (304 continuity-guided), 146 interpolated over <=60 m bridges, 26 fell back to prior widths (45 dark/shadow-suspect stations). Measured full-width range 9.5-27.0 m (median 15.0 m). Kerbs: 4/24 strips imagery-detected. QA review: no TUMFTM cross-check exists for Jeddah (prior was constant 12 m). Edges follow visible road boundaries cleanly along the wall-lined street sections. The S/F-straight maximum (~25-27 m, route points ~0-8 and ~320-322) spans the full paved corridor INCLUDING the pit lane — the pit-lane separator wall is race-week temporary and invisible in imagery, so the detector cannot do better; racing width there is narrower. Shadow-driven fallbacks (building shadows mid-lap) behaved honestly."
+    },
+    {
+      "id": "montreal",
+      "name": "Circuit Gilles Villeneuve",
+      "country": "Canada",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/ca-1978.geojson",
+          "sha256": "8ae58f4f6c32dc1b5f0df475bc3f6ef6441c63838e3ead4fd38299e2dc6cb5e6",
+          "cache": "bacinger-ca-1978.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Montreal.csv",
+          "sha256": "0b27cf74193ea20ebab058a300cd935d2c07bb6003a898e108febcd63a3c42be",
+          "cache": "tumftm-Montreal.csv"
+        }
+      ],
+      "widthProvenance": "tumftm-satellite",
+      "alignmentRms": 1.077,
+      "lengthM": 4365,
+      "points": 872,
+      "confidence": 0.8,
+      "kerbStrips": 14,
+      "verified": false,
+      "imageryZoom": 19,
+      "imageryZooms": {
+        "18": 17,
+        "19": 275
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 292,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        8.25,
+        26.5
+      ],
+      "pctMeasured": 85.2,
+      "imageryMeasuredAt": "2026-09-08T08:05:00.358Z",
+      "imageryNotes": "WIDTHS REVERTED TO TUMFTM PRIORS - imagery measurement attempted and rejected. Imagery measurement 2026-09-08T08:05:00.358Z: 292 tiles, mosaic 3840x9984 px, zoom 19 (fallbacks: {\"18\":17,\"19\":275}) (~0.21 m/px at track latitude). 85.2% of 873 stations measured at confidence>=0.45 (154 continuity-guided), 129 interpolated over <=60 m bridges, 0 fell back to prior widths (3 dark/shadow-suspect stations). Measured full-width range 8.3-26.5 m (median 15.8 m). NOTE: the automatic cross-validation above compared against the previous z18 measurement (re-run contamination), not TUMFTM. Independent check against reference/tumftm-Montreal.csv by arc-length: MAD 6.16 m, bias +6.14 m, r=0.336, 71.6% of measured stations >4 m wider than TUMFTM — the detector locks onto the full paved corridor (asphalt + paved shoulders/aprons) on this park-road circuit, not the marked racing corridor. Widths are paved-corridor estimates; treat as low-confidence for racing width.  Kerbs: 0/12 strips imagery-detected. Resolution: TUMFTM satellite-derived widths restored via build-track-library rebuild on 2026-09-08; widthProvenance stays tumftm-satellite; QA render retained as documentation. Kerbs 0/14 imagery-detected (synthetic)."
+    },
+    {
+      "id": "catalunya",
+      "name": "Circuit de Barcelona-Catalunya",
+      "country": "Spain",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/es-1991.geojson",
+          "sha256": "739784fa7fe51e38040b7a30a21fe5288564f8901a87fbb27c8cc22462a05c29",
+          "cache": "bacinger-es-1991.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Catalunya.csv",
+          "sha256": "8d6dc9d50e98bdecd818cb880a4b12bb5cec25d699a6b774e0b593c0f8a9da5e",
+          "cache": "tumftm-Catalunya.csv"
+        }
+      ],
+      "widthProvenance": "tumftm-satellite",
+      "alignmentRms": 6.181,
+      "lengthM": 4695,
+      "points": 931,
+      "confidence": 0.66,
+      "kerbStrips": 32,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 74
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 74,
+      "kerbProvenance": "mixed",
+      "measuredWidthRangeM": [
+        7,
+        29.5
+      ],
+      "pctMeasured": 87.6,
+      "imageryMeasuredAt": "2026-09-08T08:01:29.063Z",
+      "imageryNotes": "WIDTHS REVERTED TO TUMFTM PRIORS - imagery measurement attempted and rejected. Imagery measurement 2026-09-08T08:01:29.063Z: 74 tiles, mosaic 2560x3072 px, zoom 18 (~0.45 m/px at track latitude). 87.6% of 939 stations measured at confidence>=0.45 (163 continuity-guided), 60 interpolated over <=60 m bridges, 56 fell back to prior widths (64 dark/shadow-suspect stations). Measured full-width range 7.0-29.5 m (median 16.8 m). TUMFTM cross-validation over 823 measured stations: Pearson r=0.148, mean |Δ full width|=6.87 m. Kerbs: 3/22 strips imagery-detected. QA review: TUMFTM cross-validation (genuine, first run) shows systematic paved-corridor bias — measured edges sit OUTSIDE the red/white kerbs and white edge lines on most of the lap (MAD 6.86 m, bias +6.56 m, r=0.147, 68% of measured stations >4 m wider than TUMFTM). Widths are paved-corridor estimates; treat as low-confidence for racing width. Final-corner complex (route points ~815-870) is unusable: widths swing 7.0-29.5 m where old-chicane and current sweeper pavements overlap. Kerb detections at corners 4-5 are solid (red fraction 21-37%, runs 30-55 m). Resolution: TUMFTM satellite-derived widths restored via build-track-library rebuild on 2026-09-08; widthProvenance stays tumftm-satellite; QA render retained as documentation. Kerbs 3/32 imagery-detected (retained from the imagery run; see kerbs file)."
+    },
+    {
+      "id": "spielberg",
+      "name": "Red Bull Ring",
+      "country": "Austria",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/at-1969.geojson",
+          "sha256": "6d84ffac3a212aed8bedd6513535b1cffb1ff2586e055f4921b7f8cd4c334ec3",
+          "cache": "bacinger-at-1969.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Spielberg.csv",
+          "sha256": "277b2854c4323021b10b6b63ebfe6a6cc971f494c0728202e910d67d7d65dc8c",
+          "cache": "tumftm-Spielberg.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 1.725,
+      "lengthM": 4318,
+      "points": 864,
+      "confidence": 0.8,
+      "kerbStrips": 14,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 86
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 86,
+      "kerbProvenance": "mixed",
+      "measuredWidthRangeM": [
+        10.5,
+        25.25
+      ],
+      "pctMeasured": 67.7,
+      "imageryMeasuredAt": "2026-09-08T06:55:21.666Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T06:55:21.666Z: 86 tiles, mosaic 3584x2304 px, zoom 18 (~0.41 m/px at track latitude). 67.7% of 864 stations measured at confidence>=0.45 (78 continuity-guided), 183 interpolated over <=60 m bridges, 96 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 10.5-25.3 m (median 17.0 m). TUMFTM cross-validation over 585 measured stations: Pearson r=0.333, mean |Δ full width|=6.51 m. Kerbs: 3/14 strips imagery-detected."
+    },
+    {
+      "id": "silverstone",
+      "name": "Silverstone Circuit",
+      "country": "United Kingdom",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/gb-1948.geojson",
+          "sha256": "1e526462a785f15acb6bf9af2fefa7a1b4521e665bfbe663d58539516ba9ea68",
+          "cache": "bacinger-gb-1948.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Silverstone.csv",
+          "sha256": "27c51454e81780a75c353d3e6c9f73dbbcd1e82139782e95bd722ade19736e39",
+          "cache": "tumftm-Silverstone.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 1.444,
+      "lengthM": 5881,
+      "points": 1178,
+      "confidence": 0.8,
+      "kerbStrips": 28,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 157
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 157,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        8.75,
+        30
+      ],
+      "pctMeasured": 61.8,
+      "imageryMeasuredAt": "2026-09-08T08:08:25.066Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T08:08:25.066Z: 157 tiles, mosaic 3328x5120 px, zoom 18 (~0.37 m/px at track latitude). 61.8% of 1176 stations measured at confidence>=0.45 (27 continuity-guided), 215 interpolated over <=60 m bridges, 234 fell back to prior widths (54 dark/shadow-suspect stations). Measured full-width range 8.8-30.0 m (median 16.3 m). TUMFTM cross-validation over 727 measured stations: Pearson r=0.681, mean |Δ full width|=1.79 m. Kerbs: 0/28 strips imagery-detected."
+    },
+    {
+      "id": "spa",
+      "name": "Circuit de Spa-Francorchamps",
+      "country": "Belgium",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/be-1925.geojson",
+          "sha256": "b867de9cc8364cc9b545a044377a56a697b8db77823c849c1a1c03760a943381",
+          "cache": "bacinger-be-1925.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Spa.csv",
+          "sha256": "952673dfa772427be8a9013b8c1cb5ff5935f85c0c21d2a223adb04c6d640c8a",
+          "cache": "tumftm-Spa.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 0.948,
+      "lengthM": 6989,
+      "points": 1401,
+      "confidence": 0.8,
+      "kerbStrips": 20,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 180
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 180,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7,
+        30
+      ],
+      "pctMeasured": 70.7,
+      "imageryMeasuredAt": "2026-09-08T07:44:13.592Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:44:13.592Z: 180 tiles, mosaic 3840x5888 px, zoom 18 (~0.38 m/px at track latitude). 70.7% of 1398 stations measured at confidence>=0.45 (123 continuity-guided), 291 interpolated over <=60 m bridges, 118 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 7.0-30.0 m (median 13.0 m). TUMFTM cross-validation over 989 measured stations: Pearson r=0.315, mean |Δ full width|=4.24 m. Kerbs: 0/20 strips imagery-detected."
+    },
+    {
+      "id": "budapest",
+      "name": "Hungaroring",
+      "country": "Hungary",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/hu-1986.geojson",
+          "sha256": "f822ff317874776d37d15970723f6007b463ab04c25ef5ce8ecb651c5478ee0d",
+          "cache": "bacinger-hu-1986.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Budapest.csv",
+          "sha256": "3c25a55841af6de1e78a366593108835738d78e75cedfb7acd11c9b36da53d5a",
+          "cache": "tumftm-Budapest.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery+default-fallback",
+      "alignmentRms": 1.352,
+      "lengthM": 4376,
+      "points": 876,
+      "confidence": 0.8,
+      "kerbStrips": 24,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 98
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 98,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7.75,
+        17
+      ],
+      "pctMeasured": 32,
+      "imageryMeasuredAt": "2026-09-08T08:09:02.840Z",
+      "imageryNotes": "Paved-apron overshoot guard (--max-full-width 16 m): 467 stations whose measured full width exceeded the cap were treated as unmeasured and fell back to prior widths. Imagery measurement 2026-09-08T08:09:02.840Z: 98 tiles, mosaic 3072x3584 px, zoom 18 (~0.40 m/px at track latitude). 32.0% of 875 stations measured at confidence>=0.45 (90 continuity-guided), 260 interpolated over <=60 m bridges, 335 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 7.8-17.0 m (median 12.3 m). TUMFTM cross-validation over 280 measured stations: Pearson r=0.665, mean |Δ full width|=1.27 m. Kerbs: 0/24 strips imagery-detected."
+    },
+    {
+      "id": "monza",
+      "name": "Autodromo Nazionale Monza",
+      "country": "Italy",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/it-1922.geojson",
+          "sha256": "8b0758ef5a52bb9360c7673d45e0fbea6f29f7349486c5acbb2fe9aa340cb495",
+          "cache": "bacinger-it-1922.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Monza.csv",
+          "sha256": "4b5993986e67950df1b89efa03a4df02127f07b7213985917f0bad27ad3d48b6",
+          "cache": "tumftm-Monza.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 0.949,
+      "lengthM": 5794,
+      "points": 1159,
+      "confidence": 0.8,
+      "kerbStrips": 16,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 132
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 132,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7,
+        26.75
+      ],
+      "pctMeasured": 86.4,
+      "imageryMeasuredAt": "2026-09-08T07:38:09.129Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:38:09.129Z: 132 tiles, mosaic 3584x5632 px, zoom 18 (~0.42 m/px at track latitude). 86.4% of 1159 stations measured at confidence>=0.45 (256 continuity-guided), 158 interpolated over <=60 m bridges, 0 fell back to prior widths (16 dark/shadow-suspect stations). Measured full-width range 7.0-26.8 m (median 12.5 m). TUMFTM cross-validation over 1001 measured stations: Pearson r=0.416, mean |Δ full width|=4.21 m. Kerbs: 0/16 strips imagery-detected."
+    },
+    {
+      "id": "austin",
+      "name": "Circuit of the Americas",
+      "country": "United States",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/us-2012.geojson",
+          "sha256": "199621d61cf0b50429fc9fcf1a8dabf016df453e33bf64299a651e1acad7e158",
+          "cache": "bacinger-us-2012.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Austin.csv",
+          "sha256": "60d46180320177ba49bec61bad390872039222dbab225fe12781ca662becda55",
+          "cache": "tumftm-Austin.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 1.039,
+      "lengthM": 5503,
+      "points": 1102,
+      "confidence": 0.8,
+      "kerbStrips": 32,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 78
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 78,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        10.25,
+        28.25
+      ],
+      "pctMeasured": 99.4,
+      "imageryMeasuredAt": "2026-09-08T06:55:20.797Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T06:55:20.797Z: 78 tiles, mosaic 4096x2560 px, zoom 18 (~0.52 m/px at track latitude). 99.4% of 1101 stations measured at confidence>=0.45 (128 continuity-guided), 7 interpolated over <=60 m bridges, 0 fell back to prior widths (2 dark/shadow-suspect stations). Measured full-width range 10.3-28.3 m (median 13.8 m). TUMFTM cross-validation over 1094 measured stations: Pearson r=0.348, mean |Δ full width|=2.22 m. Kerbs: 0/32 strips imagery-detected."
+    },
+    {
+      "id": "mexico-city",
+      "name": "Autódromo Hermanos Rodríguez",
+      "country": "Mexico",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/mx-1962.geojson",
+          "sha256": "c552fb24debdb6f8381b70da1eec02c6595d870a4abf9f87b582dbd3bac2eb06",
+          "cache": "bacinger-mx-1962.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/MexicoCity.csv",
+          "sha256": "fc16f83e3e81308a47b8726439f0ff3bb7ce7593f0fdcea053d61e47a14c89f3",
+          "cache": "tumftm-MexicoCity.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 2.435,
+      "lengthM": 4316,
+      "points": 860,
+      "confidence": 0.78,
+      "kerbStrips": 24,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 57
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 57,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7.5,
+        29.5
+      ],
+      "pctMeasured": 89.9,
+      "imageryMeasuredAt": "2026-09-08T07:43:45.794Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:43:45.794Z: 57 tiles, mosaic 3072x2304 px, zoom 18 (~0.56 m/px at track latitude). 89.9% of 863 stations measured at confidence>=0.45 (197 continuity-guided), 87 interpolated over <=60 m bridges, 0 fell back to prior widths (33 dark/shadow-suspect stations). Measured full-width range 7.5-29.5 m (median 17.3 m). TUMFTM cross-validation over 776 measured stations: Pearson r=0.080, mean |Δ full width|=5.60 m. Kerbs: 0/24 strips imagery-detected."
+    },
+    {
+      "id": "sao-paulo",
+      "name": "Autódromo José Carlos Pace (Interlagos)",
+      "country": "Brazil",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/br-1940.geojson",
+          "sha256": "e650e59b876af7c455ec3222e0801b5aab008ed858c71bf6bc84e7af6d6f2bba",
+          "cache": "bacinger-br-1940.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/SaoPaulo.csv",
+          "sha256": "7383caa2b7af9af6c321aa5442cc5b47b6cfe1a56f70b56f3216ba1a3c015a04",
+          "cache": "tumftm-SaoPaulo.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "alignmentRms": 2.3,
+      "lengthM": 4299,
+      "points": 862,
+      "confidence": 0.78,
+      "kerbStrips": 20,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 46
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 46,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        6.75,
+        28.25
+      ],
+      "pctMeasured": 54.5,
+      "imageryMeasuredAt": "2026-09-08T07:38:12.058Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:38:12.058Z: 46 tiles, mosaic 1536x2304 px, zoom 18 (~0.55 m/px at track latitude). 54.5% of 860 stations measured at confidence>=0.45 (111 continuity-guided), 90 interpolated over <=60 m bridges, 301 fell back to prior widths (339 dark/shadow-suspect stations). Measured full-width range 6.8-28.3 m (median 14.8 m). TUMFTM cross-validation over 469 measured stations: Pearson r=0.121, mean |Δ full width|=4.09 m. Kerbs: 0/20 strips imagery-detected."
+    },
+    {
+      "id": "zandvoort",
+      "name": "Circuit Zandvoort",
+      "country": "Netherlands",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/nl-1948.geojson",
+          "sha256": "4f639dad939d1fd87514695a91f3d0926feb0a72ec90af557a3b1209023c0215",
+          "cache": "bacinger-nl-1948.geojson"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/TUMFTM/racetrack-database/master/tracks/Zandvoort.csv",
+          "sha256": "f3f2a82c9f41bcee8d7161a6ad6c0b8e6d4b902dd772459918c9fe7f7451bc59",
+          "cache": "tumftm-Zandvoort.csv"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "TUMFTM Zandvoort.csv is believed to be the pre-2020 DTM layout; bacinger F1 centerline used for geometry, 12 m FIA-minimum nominal width. TUMFTM Zandvoort.csv cross-check fits the bacinger F1 loop at 2.53 m RMS — centerlines agree closely, so the CSV is not a grossly different layout, but its pre-2020 DTM provenance means its widths may not match the reprofiled banked corners; rejected as width source per roster policy.",
+      "alignmentRms": 0,
+      "lengthM": 4260,
+      "points": 223,
+      "confidence": 0.8,
+      "kerbStrips": 18,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 87
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 87,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7.75,
+        20
+      ],
+      "pctMeasured": 96.5,
+      "imageryMeasuredAt": "2026-09-08T08:15:37.153Z",
+      "imageryNotes": "Paved-apron overshoot guard (--max-full-width 20 m): 29 stations whose measured full width exceeded the cap were treated as unmeasured and fell back to prior widths. Imagery measurement 2026-09-08T08:15:37.153Z: 87 tiles, mosaic 3328x2816 px, zoom 18 (~0.36 m/px at track latitude). 96.5% of 852 stations measured at confidence>=0.45 (165 continuity-guided), 17 interpolated over <=60 m bridges, 13 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 7.8-20.0 m (median 12.0 m). Kerbs: 0/18 strips imagery-detected."
+    },
+    {
+      "id": "monaco",
+      "name": "Circuit de Monaco",
+      "country": "Monaco",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/mc-1929.geojson",
+          "sha256": "daf184fc7d0948cadd10ce9428ba87b5462d9df6e33daec7b6f9aad235dc879e",
+          "cache": "bacinger-mc-1929.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "Street circuit narrower than the FIA 12 m minimum in places; 11 m nominal.",
+      "alignmentRms": 0,
+      "lengthM": 3328,
+      "points": 223,
+      "confidence": 0.8,
+      "kerbStrips": 26,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 50
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 50,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7.25,
+        24
+      ],
+      "pctMeasured": 85.7,
+      "imageryMeasuredAt": "2026-09-08T06:55:19.944Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T06:55:19.944Z: 50 tiles, mosaic 2304x2816 px, zoom 18 (~0.43 m/px at track latitude). 85.7% of 666 stations measured at confidence>=0.45 (234 continuity-guided), 95 interpolated over <=60 m bridges, 0 fell back to prior widths (67 dark/shadow-suspect stations). Measured full-width range 7.3-24.0 m (median 14.3 m). Kerbs: 0/26 strips imagery-detected."
+    },
+    {
+      "id": "miami",
+      "name": "Miami International Autodrome",
+      "country": "United States",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/us-2022.geojson",
+          "sha256": "6081f7e67221df77a20e3c9e1ed226b008ec06c1ce7501fc10bcaf9e3a11d0c7",
+          "cache": "bacinger-us-2022.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "12 m FIA-minimum nominal width.",
+      "alignmentRms": 0,
+      "lengthM": 5421,
+      "points": 264,
+      "confidence": 0.8,
+      "kerbStrips": 28,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 64
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 64,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        7.75,
+        26
+      ],
+      "pctMeasured": 87.2,
+      "imageryMeasuredAt": "2026-09-08T07:41:26.340Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:41:26.340Z: 64 tiles, mosaic 3072x1536 px, zoom 18 (~0.54 m/px at track latitude). 87.2% of 1084 stations measured at confidence>=0.45 (180 continuity-guided), 77 interpolated over <=60 m bridges, 62 fell back to prior widths (73 dark/shadow-suspect stations). Measured full-width range 7.8-26.0 m (median 15.3 m). Kerbs: 0/28 strips imagery-detected. QA review: no TUMFTM cross-check exists for Miami (prior was constant 12 m). Stadium-section maximum (~23-26 m) follows the genuinely wide stadium perimeter road. Back-straight minimum (7.8-8.3 m, route points ~191-194) may under-measure: the detector locks onto the edge of the marked carriageway where a concrete divider/merge apron sits inside the paved corridor — racing width there is likely ~10-12 m. 0/28 kerbs imagery-detected is expected and honest: Miami uses temporary race-week kerbs not present in base imagery."
+    },
+    {
+      "id": "baku",
+      "name": "Baku City Circuit",
+      "country": "Azerbaijan",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/az-2016.geojson",
+          "sha256": "778230a47bee57c5eebb9d5b48143eadceff92603fd6035551e57f165862fd4b",
+          "cache": "bacinger-az-2016.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery+default-fallback",
+      "widthNote": "10 m nominal; the old-town section narrows to ~7.6 m, so this default is optimistic there.",
+      "alignmentRms": 0,
+      "lengthM": 5949,
+      "points": 280,
+      "confidence": 0.8,
+      "kerbStrips": 24,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 109
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 109,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        10.5,
+        29.5
+      ],
+      "pctMeasured": 58.2,
+      "imageryMeasuredAt": "2026-09-08T07:38:49.758Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:38:49.758Z: 109 tiles, mosaic 4864x3840 px, zoom 18 (~0.45 m/px at track latitude). 58.2% of 1190 stations measured at confidence>=0.45 (266 continuity-guided), 352 interpolated over <=60 m bridges, 145 fell back to prior widths (350 dark/shadow-suspect stations). Measured full-width range 10.5-29.5 m (median 21.5 m). Kerbs: 0/24 strips imagery-detected. Reviewer note: the ~7.6 m old-town castle pinch (T8-T10) was NOT confidently measured (deep building shadow in imagery); prior widths are retained there — treat the 10.5 m measured minimum as not covering the pinch. Boulevard fallbacks are likewise shadow-driven and keep prior widths by design. MANUAL OVERRIDE applied 2026-09-08: castle-section span (route points 124-150, arc ~2613-3099 m, approx turns 8-12) set to 8.0 m full width (4.0 m halves) as a documented manual estimate - the publicly documented ~7.6 m pinch was shadowed in imagery and unmeasurable; prior 10 m constant widths had been retained there. widthProvenance downgraded to esri-imagery+default-fallback accordingly."
+    },
+    {
+      "id": "singapore",
+      "name": "Marina Bay Street Circuit",
+      "country": "Singapore",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/sg-2008.geojson",
+          "sha256": "aa9584b50acffaabed7a06b5c0baa37fab38f0c70ad3c5ebba27706f3371bf9c",
+          "cache": "bacinger-sg-2008.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "12 m FIA-minimum nominal width.",
+      "alignmentRms": 0,
+      "lengthM": 4948,
+      "points": 255,
+      "confidence": 0.8,
+      "kerbStrips": 28,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 55
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 55,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        9.75,
+        29
+      ],
+      "pctMeasured": 73.1,
+      "imageryMeasuredAt": "2026-09-08T07:40:41.163Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T07:40:41.163Z: 55 tiles, mosaic 2816x2048 px, zoom 18 (~0.60 m/px at track latitude). 73.1% of 990 stations measured at confidence>=0.45 (202 continuity-guided), 237 interpolated over <=60 m bridges, 29 fell back to prior widths (24 dark/shadow-suspect stations). Measured full-width range 9.8-29.0 m (median 19.0 m). Kerbs: 0/28 strips imagery-detected."
+    },
+    {
+      "id": "las-vegas",
+      "name": "Las Vegas Strip Circuit",
+      "country": "United States",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/us-2023.geojson",
+          "sha256": "bebd86828c5016ede9d6b1133f3f8fbb8301e357018bb551d2514a621803d29d",
+          "cache": "bacinger-us-2023.geojson"
+        }
+      ],
+      "widthProvenance": "constant-default",
+      "widthNote": "12 m nominal; the Strip itself is wider, but 12 m keeps overlays on the racing line corridor.",
+      "alignmentRms": 0,
+      "lengthM": 6228,
+      "points": 297,
+      "confidence": 0.8,
+      "kerbStrips": 26,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 109
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 109,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": null,
+      "pctMeasured": 0,
+      "imageryMeasuredAt": "2026-09-08T08:00:00.214Z",
+      "imageryNotes": "Imagery measurement attempted 2026-09-08 and rejected (constant-default fallback). Esri World Imagery z18 (~0.48 m/px), 109 tiles, mosaic 3072x4608 px. The detector found edges at 47.3% of 1246 stations (357 interpolated, 300 fell back, 212 dark/shadow-suspect) with measured full-width range 8.0-28.5 m, median 20.8 m — on the street sections (Las Vegas Blvd, Sands/Spring Mountain/Koval/Harmon) this is the full public-road width curb-to-curb, not the race-week fenced racing corridor (~12 m nominal), which is not distinguishable in imagery. Applying it would write confidently wrong widths, so the constant 12 m default was retained (honest fallback, mirroring the madrid policy). Kerbs: 0/16 strips imagery-detected; all 26 strips curvature-synthetic. QA render tracks2026-qa/las-vegas.png retained as documentation of the attempt."
+    },
+    {
+      "id": "lusail",
+      "name": "Lusail International Circuit",
+      "country": "Qatar",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/qa-2004.geojson",
+          "sha256": "961a8c50ce500ed83446ce32e5947ce594706a7d8d7ae4fcffc60b78a38f822b",
+          "cache": "bacinger-qa-2004.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "12 m FIA-minimum nominal width.",
+      "alignmentRms": 0,
+      "lengthM": 5427,
+      "points": 256,
+      "confidence": 0.8,
+      "kerbStrips": 26,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 81
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 81,
+      "kerbProvenance": "mixed",
+      "measuredWidthRangeM": [
+        9.5,
+        29
+      ],
+      "pctMeasured": 56.6,
+      "imageryMeasuredAt": "2026-09-08T08:00:58.870Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T08:00:58.870Z: 81 tiles, mosaic 2816x3072 px, zoom 18 (~0.54 m/px at track latitude). 56.6% of 1085 stations measured at confidence>=0.45 (103 continuity-guided), 184 interpolated over <=60 m bridges, 287 fell back to prior widths (413 dark/shadow-suspect stations). Measured full-width range 9.5-29.0 m (median 15.3 m). Kerbs: 7/26 strips imagery-detected."
+    },
+    {
+      "id": "yas-marina",
+      "name": "Yas Marina Circuit",
+      "country": "United Arab Emirates",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/ae-2009.geojson",
+          "sha256": "91ea23fc8bdcdbc1e23b007f99910c84fc0ff595663b3bf5c9954f54f882caa3",
+          "cache": "bacinger-ae-2009.geojson"
+        }
+      ],
+      "widthProvenance": "esri-imagery",
+      "widthNote": "TUMFTM YasMarina.csv exists but predates the 2021 reprofiling; bacinger ae-2009 matches the current 5.281 km layout. 12 m nominal width.",
+      "alignmentRms": 0,
+      "lengthM": 5299,
+      "points": 277,
+      "confidence": 0.8,
+      "kerbStrips": 22,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 63
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 63,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": [
+        11.5,
+        29.25
+      ],
+      "pctMeasured": 75.6,
+      "imageryMeasuredAt": "2026-09-08T08:06:47.710Z",
+      "imageryNotes": "Imagery measurement 2026-09-08T08:06:47.710Z: 63 tiles, mosaic 1792x3584 px, zoom 18 (~0.54 m/px at track latitude). 75.6% of 1060 stations measured at confidence>=0.45 (185 continuity-guided), 168 interpolated over <=60 m bridges, 91 fell back to prior widths (110 dark/shadow-suspect stations). Measured full-width range 11.5-29.3 m (median 16.8 m). Kerbs: 0/22 strips imagery-detected."
+    },
+    {
+      "id": "madrid",
+      "name": "Circuito de Madring",
+      "country": "Spain",
+      "status": "ok",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bacinger/f1-circuits/master/circuits/es-2026.geojson",
+          "sha256": "b362021622d76cd4600dd8d1e825224689ee7d9a98b0d07e39726b65c3b4def1",
+          "cache": "bacinger-es-2026.geojson"
+        }
+      ],
+      "widthProvenance": "constant-default",
+      "widthNote": "Brand-new hybrid circuit (first race 2026); no measured widths exist anywhere. 12 m FIA-minimum nominal width.",
+      "alignmentRms": 0,
+      "lengthM": 5436,
+      "points": 276,
+      "confidence": 0.8,
+      "kerbStrips": 38,
+      "verified": false,
+      "imageryZoom": 18,
+      "imageryZooms": {
+        "18": 99
+      },
+      "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      "imageryTiles": 99,
+      "kerbProvenance": "synthetic",
+      "measuredWidthRangeM": null,
+      "pctMeasured": 0,
+      "imageryMeasuredAt": "2026-09-08T07:42:29.075Z",
+      "imageryNotes": "CONSTANT-DEFAULT FALLBACK (--constant-default): available Esri imagery predates circuit construction, so no width/kerb measurement was attempted; prior constant-default widths kept at every station and all kerbs remain synthetic. Imagery measurement 2026-09-08T07:42:29.075Z: 99 tiles, mosaic 3072x4352 px, zoom 18 (~0.45 m/px at track latitude). 0.0% of 1087 stations measured at confidence>=0.45 (160 continuity-guided), 0 interpolated over <=60 m bridges, 1087 fell back to prior widths (4 dark/shadow-suspect stations). No confident measurements. Kerbs: 0/38 strips imagery-detected."
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "circuit": "miami",
+  "year": 2026,
+  "centerline": "../reference/bacinger-us-2022.geojson",
+  "centerlineSource": "https://github.com/bacinger/f1-circuits/blob/master/circuits/us-2022.geojson",
+  "reverse": false,
+  "zoom": 19,
+  "marginM": 200,
+  "spacingM": 1,
+  "strokePixels": 2,
+  "maxAlignmentRmsM": 1.5,
+  "imagery": {
+    "zoom": 19,
+    "originPx": [
+      37190567,
+      57079927
+    ],
+    "scale": 1,
+    "nativeMetersPerPixel": 0.2684597264334658,
+    "source": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer",
+    "attribution": "Miami-Dade County | GIS Groups",
+    "licenseEvidence": "Miami-Dade County GIS Data Download: For Public Use; provided as-is for illustration. https://www.arcgis.com/home/item.html?id=df9bba0031c0453da91ef55371c697f2",
+    "serviceYearLabel": 2025,
+    "captureDate": "Not supplied by service; other service fields still say 2024",
+    "imagePath": "../imagery/miami-county/mosaic.png"
+  },
+  "controls": [
+    {
+      "image": [
+        -80.24447858333588,
+        25.956117778087172
+      ],
+      "reference": [
+        -80.244481,
+        25.956108
+      ],
+      "label": "Turn 8 exit marked-corridor midpoint",
+      "imagePixel": [
+        987,
+        2728
+      ],
+      "method": "Manual visual midpoint of marked racing corridor at corresponding centerline bend; approximate, not surveyed"
+    },
+    {
+      "image": [
+        -80.23063033819199,
+        25.957311540427394
+      ],
+      "reference": [
+        -80.230627,
+        25.957308
+      ],
+      "label": "Turn 11 apex marked-corridor midpoint",
+      "imagePixel": [
+        6150,
+        2233
+      ],
+      "method": "Manual visual midpoint of marked racing corridor at corresponding centerline bend; approximate, not surveyed"
+    },
+    {
+      "image": [
+        -80.24300336837769,
+        25.960434558366522
+      ],
+      "reference": [
+        -80.242996,
+        25.960438
+      ],
+      "label": "Turn 17 apex marked-corridor midpoint",
+      "imagePixel": [
+        1537,
+        938
+      ],
+      "method": "Manual visual midpoint of marked racing corridor at corresponding centerline bend; approximate, not surveyed"
+    }
+  ],
+  "timing": {
+    "year": 2026,
+    "source": "https://www.fia.com/system/files/decision-document/2026_miami_grand_prix_-_competition_notes_-_circuit_map_pit_lane_drawing_emergency_exits_map_and_red_zone.pdf",
+    "placementSource": "Timing line axes read from official PDF vector symbols; registered by robust similarity fit of diagram road medial axis to bacinger centerline. Geographic placement is approximate, not surveyed. Road polygon from PDF is used only for timing registration, never for surface widths.",
+    "lines": [
+      {
+        "id": "finish",
+        "coordinates": [
+          [
+            -80.23850629723401,
+            25.960077715839777
+          ],
+          [
+            -80.2388829740589,
+            25.95954703572396
+          ]
+        ]
+      },
+      {
+        "id": "s1",
+        "coordinates": [
+          [
+            -80.24311995786269,
+            25.956362525094242
+          ],
+          [
+            -80.24328208969806,
+            25.955749656755692
+          ]
+        ]
+      },
+      {
+        "id": "s2",
+        "coordinates": [
+          [
+            -80.23069032751624,
+            25.960457412961897
+          ],
+          [
+            -80.23071817912833,
+            25.95982683015266
+          ]
+        ]
+      }
+    ],
+    "registrationRmsM": 1.1346973035551728,
+    "referenceToDiagram": [
+      0.3352726901375178,
+      0.20990640244944658,
+      298.88115452944294,
+      -474.7476761191835
+    ],
+    "diagramLineEndpointsPt": {
+      "finish": [
+        [
+          216.3,
+          406.5
+        ],
+        [
+          216.18,
+          420.36
+        ]
+      ],
+      "s1": [
+        [
+          150.57,
+          641.73
+        ],
+        [
+          155.01,
+          654.87
+        ]
+      ],
+      "s2": [
+        [
+          473.22,
+          227.22
+        ],
+        [
+          480.12,
+          239.28
+        ]
+      ]
+    },
+    "note": "Timing line axes read from official PDF vector symbols; registered by robust similarity fit of diagram road medial axis to bacinger centerline. Geographic placement is approximate, not surveyed. Road polygon from PDF is used only for timing registration, never for surface widths."
+  },
+  "officialTimingReference": {
+    "source": "https://www.fia.com/system/files/decision-document/2026_miami_grand_prix_-_competition_notes_-_circuit_map_pit_lane_drawing_emergency_exits_map_and_red_zone.pdf",
+    "document": 5,
+    "date": "2026-04-30",
+    "page": 2,
+    "sectorLengthsM": [
+      1866,
+      1730,
+      1816
+    ],
+    "totalLengthM": 5412,
+    "s1Description": "110 m after Turn 8",
+    "s2Description": "70 m after Turn 16",
+    "status": "Georegistered official PDF timing-line symbols; see timing registration provenance and RMS."
+  },
+  "validation": {
+    "source": "https://github.com/TUMFTM/racetrack-database",
+    "status": "unavailable",
+    "reason": "Miami is not covered. No independent width validation or measured kerb-width accuracy is claimed."
+  },
+  "output": "../../../apple/Stint/Resources/miami.surface.geojson",
+  "centerlineInterpolation": "centripetal",
+  "imageryDetection": "miami-turquoise",
+  "continuousVisualization": true,
+  "kerbReview": "../reference/miami-kerb-review.json"
+}

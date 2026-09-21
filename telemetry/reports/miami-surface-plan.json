@@ -1,0 +1,58 @@
+{
+  "circuit": "miami",
+  "year": 2026,
+  "centerlineSource": "https://github.com/bacinger/f1-circuits/blob/master/circuits/us-2022.geojson",
+  "centerlineSha256": "6081f7e67221df77a20e3c9e1ed226b008ec06c1ce7501fc10bcaf9e3a11d0c7",
+  "requestedImagery": {
+    "provider": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer",
+    "maptype": "aerial",
+    "center": {
+      "latitude": 25.958,
+      "longitude": -80.239
+    },
+    "acquisition": "Local georeferenced raster; county source approved for Miami"
+  },
+  "centerlineInterpolation": "centripetal",
+  "origin": {
+    "lat0": 25.957636174757287,
+    "lon0": -80.23774728155338
+  },
+  "stations": 5432,
+  "lengthM": 5431.9405239667785,
+  "zoom": 19,
+  "marginM": 200,
+  "nominalMetersPerPixel": 0.2684605563221103,
+  "boundsWGS84": [
+    {
+      "lat": 25.95341574323186,
+      "lon": -80.24678539709873
+    },
+    {
+      "lat": 25.962394707148366,
+      "lon": -80.22776264968616
+    }
+  ],
+  "blockers": [],
+  "validation": {
+    "source": "https://github.com/TUMFTM/racetrack-database",
+    "status": "unavailable",
+    "reason": "Miami is not covered. No independent width validation or measured kerb-width accuracy is claimed."
+  },
+  "officialTimingReference": {
+    "source": "https://www.fia.com/system/files/decision-document/2026_miami_grand_prix_-_competition_notes_-_circuit_map_pit_lane_drawing_emergency_exits_map_and_red_zone.pdf",
+    "document": 5,
+    "date": "2026-04-30",
+    "page": 2,
+    "sectorLengthsM": [
+      1866,
+      1730,
+      1816
+    ],
+    "totalLengthM": 5412,
+    "s1Description": "110 m after Turn 8",
+    "s2Description": "70 m after Turn 16",
+    "status": "Georegistered official PDF timing-line symbols; see timing registration provenance and RMS."
+  },
+  "status": "ready",
+  "noNetworkRequests": true
+}

@@ -1,0 +1,1158 @@
+{
+  "schemaVersion": 1,
+  "circuit": "miami",
+  "year": 2026,
+  "imagerySha256": "f1eb73965fe60ab110300c323bb93213cfa7950485bee598af6bb3ce7933eeeb",
+  "centerlineSha256": "6081f7e67221df77a20e3c9e1ed226b008ec06c1ce7501fc10bcaf9e3a11d0c7",
+  "sources": {
+    "imagery": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer",
+    "onboard": {
+      "url": "https://www.youtube.com/watch?v=7pGVugNI59c",
+      "title": "Kimi Antonelli\u2019s Pole Lap | 2026 Miami Grand Prix | Pirelli",
+      "publisher": "FORMULA 1",
+      "channelID": "UCB_qr75-ydFVKSF9Dmo6izg",
+      "durationS": 117,
+      "usage": "Visual confirmation of kerb presence/side only; geographic traces use approved county imagery. No video or frames bundled."
+    },
+    "turnNumbering": "https://www.fia.com/system/files/decision-document/2026_miami_grand_prix_-_competition_notes_-_circuit_map_pit_lane_drawing_emergency_exits_map_and_red_zone.pdf"
+  },
+  "method": "Full-lap aerial/profile review with official 2026 onboard cross-check. Distances are approximate along the configured bacinger spline; painted strips guide raster tracing. Endpoints and hidden sections remain uncertain; no physical width or height is established.",
+  "coordinateConfidence": "low",
+  "curbs": [
+    {
+      "id": "start-t1-entry",
+      "side": "left",
+      "startM": 5285,
+      "endM": 212,
+      "turns": [
+        19,
+        1
+      ],
+      "onboardSeconds": [
+        0,
+        6
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t1-apex",
+      "side": "right",
+      "startM": 155,
+      "endM": 290,
+      "turns": [
+        1
+      ],
+      "onboardSeconds": [
+        7,
+        9
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 155,
+          "offsetM": 11
+        },
+        {
+          "distanceM": 205,
+          "offsetM": 10
+        },
+        {
+          "distanceM": 240,
+          "offsetM": 8
+        },
+        {
+          "distanceM": 268,
+          "offsetM": 8.5
+        },
+        {
+          "distanceM": 290,
+          "offsetM": 7.5
+        }
+      ]
+    },
+    {
+      "id": "t2-apex",
+      "side": "left",
+      "startM": 288,
+      "endM": 407,
+      "turns": [
+        2
+      ],
+      "onboardSeconds": [
+        9,
+        11
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t3-apex",
+      "side": "right",
+      "startM": 366,
+      "endM": 490,
+      "turns": [
+        3
+      ],
+      "onboardSeconds": [
+        11,
+        14
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 366,
+          "offsetM": 6.5
+        },
+        {
+          "distanceM": 400,
+          "offsetM": 6.75
+        },
+        {
+          "distanceM": 440,
+          "offsetM": 7
+        },
+        {
+          "distanceM": 490,
+          "offsetM": 7
+        }
+      ]
+    },
+    {
+      "id": "t4-apex",
+      "side": "left",
+      "startM": 947,
+      "endM": 1065,
+      "turns": [
+        4
+      ],
+      "onboardSeconds": [
+        19,
+        21
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 947,
+          "offsetM": 7
+        },
+        {
+          "distanceM": 980,
+          "offsetM": 8.25
+        },
+        {
+          "distanceM": 1000,
+          "offsetM": 7.75
+        },
+        {
+          "distanceM": 1020,
+          "offsetM": 8.75
+        },
+        {
+          "distanceM": 1065,
+          "offsetM": 8
+        }
+      ]
+    },
+    {
+      "id": "t5-apex",
+      "side": "right",
+      "startM": 1108,
+      "endM": 1242,
+      "turns": [
+        5
+      ],
+      "onboardSeconds": [
+        21,
+        23
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t6-apex",
+      "side": "left",
+      "startM": 1240,
+      "endM": 1310,
+      "turns": [
+        6
+      ],
+      "onboardSeconds": [
+        23,
+        25
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 1240,
+          "offsetM": 7.5
+        },
+        {
+          "distanceM": 1270,
+          "offsetM": 7.5
+        },
+        {
+          "distanceM": 1310,
+          "offsetM": 8
+        }
+      ]
+    },
+    {
+      "id": "t7-exit",
+      "side": "right",
+      "startM": 1315,
+      "endM": 1485,
+      "turns": [
+        6,
+        7
+      ],
+      "onboardSeconds": [
+        24,
+        27
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t8-apex",
+      "side": "left",
+      "startM": 1488,
+      "endM": 1565,
+      "turns": [
+        8
+      ],
+      "onboardSeconds": [
+        27,
+        29
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 1488,
+          "offsetM": 8.5
+        },
+        {
+          "distanceM": 1525,
+          "offsetM": 7.75
+        },
+        {
+          "distanceM": 1550,
+          "offsetM": 7.75
+        },
+        {
+          "distanceM": 1565,
+          "offsetM": 8
+        }
+      ]
+    },
+    {
+      "id": "t8-exit",
+      "side": "right",
+      "startM": 1568,
+      "endM": 1670,
+      "turns": [
+        8
+      ],
+      "onboardSeconds": [
+        29,
+        32
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t11-entry",
+      "side": "right",
+      "startM": 2860,
+      "endM": 2962,
+      "turns": [
+        11
+      ],
+      "onboardSeconds": [
+        45,
+        48
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t11-apex",
+      "side": "left",
+      "startM": 2967,
+      "endM": 3050,
+      "turns": [
+        11
+      ],
+      "onboardSeconds": [
+        47,
+        49
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t12-apex",
+      "side": "right",
+      "startM": 3070,
+      "endM": 3208,
+      "turns": [
+        12
+      ],
+      "onboardSeconds": [
+        49,
+        53
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t13-apex",
+      "side": "left",
+      "startM": 3218,
+      "endM": 3290,
+      "turns": [
+        13
+      ],
+      "onboardSeconds": [
+        53,
+        55.5
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 3218,
+          "offsetM": 6
+        },
+        {
+          "distanceM": 3240,
+          "offsetM": 6
+        },
+        {
+          "distanceM": 3260,
+          "offsetM": 4.75
+        },
+        {
+          "distanceM": 3290,
+          "offsetM": 6
+        }
+      ]
+    },
+    {
+      "id": "t14-entry",
+      "side": "right",
+      "startM": 3290,
+      "endM": 3332,
+      "turns": [
+        14
+      ],
+      "onboardSeconds": [
+        55,
+        57
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 3290,
+          "offsetM": 4.5
+        },
+        {
+          "distanceM": 3310,
+          "offsetM": 4.5
+        },
+        {
+          "distanceM": 3332,
+          "offsetM": 5
+        }
+      ]
+    },
+    {
+      "id": "t14-apex",
+      "side": "left",
+      "startM": 3330,
+      "endM": 3357,
+      "turns": [
+        14
+      ],
+      "onboardSeconds": [
+        56.5,
+        58.5
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t15-apex",
+      "side": "right",
+      "startM": 3358,
+      "endM": 3398,
+      "turns": [
+        15
+      ],
+      "onboardSeconds": [
+        57.5,
+        59
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t15-exit",
+      "side": "left",
+      "startM": 3397,
+      "endM": 3444,
+      "turns": [
+        15
+      ],
+      "onboardSeconds": [
+        59,
+        60
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t16-entry",
+      "side": "right",
+      "startM": 3418,
+      "endM": 3462,
+      "turns": [
+        16
+      ],
+      "onboardSeconds": [
+        60,
+        61.5
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t16-apex",
+      "side": "left",
+      "startM": 3460,
+      "endM": 3532,
+      "turns": [
+        16
+      ],
+      "onboardSeconds": [
+        61,
+        63
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t17-entry",
+      "side": "right",
+      "startM": 4610,
+      "endM": 4760,
+      "turns": [
+        17
+      ],
+      "onboardSeconds": [
+        77,
+        80
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8,
+      "anchors": [
+        {
+          "distanceM": 4610,
+          "offsetM": 2.25
+        },
+        {
+          "distanceM": 4660,
+          "offsetM": 2.25
+        },
+        {
+          "distanceM": 4700,
+          "offsetM": 2.75
+        },
+        {
+          "distanceM": 4730,
+          "offsetM": 3.5
+        },
+        {
+          "distanceM": 4760,
+          "offsetM": 5
+        }
+      ]
+    },
+    {
+      "id": "t17-apex",
+      "side": "left",
+      "startM": 4772,
+      "endM": 4843,
+      "turns": [
+        17
+      ],
+      "onboardSeconds": [
+        79,
+        81
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t17-exit",
+      "side": "right",
+      "startM": 4834,
+      "endM": 4895,
+      "turns": [
+        17
+      ],
+      "onboardSeconds": [
+        81,
+        83
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t18-apex",
+      "side": "left",
+      "startM": 4898,
+      "endM": 5004,
+      "turns": [
+        18
+      ],
+      "onboardSeconds": [
+        83,
+        85
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    },
+    {
+      "id": "t19-apex-exit",
+      "side": "right",
+      "startM": 5005,
+      "endM": 5272,
+      "turns": [
+        19
+      ],
+      "onboardSeconds": [
+        85,
+        89
+      ],
+      "presence": "seen-onboard",
+      "evidence": "Paint strip visible in county aerial/profile atlas; side and corner checked in 2026 onboard. Bridge/shadow portions interpolate within this reviewed strip.",
+      "endpointUncertaintyM": 8
+    }
+  ],
+  "turns": [
+    {
+      "turn": 1,
+      "station": 245,
+      "distanceM": 244.9973174469552,
+      "labelPdfPt": [
+        379.71527099609375,
+        401.03367614746094
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "start-t1-entry",
+        "t1-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23530398439915,
+        25.95792140106405
+      ]
+    },
+    {
+      "turn": 2,
+      "station": 371,
+      "distanceM": 370.99593784824646,
+      "labelPdfPt": [
+        364.9395446777344,
+        462.46807861328125
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t2-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23597633248386,
+        25.95706184157667
+      ]
+    },
+    {
+      "turn": 3,
+      "station": 449,
+      "distanceM": 448.9950838109506,
+      "labelPdfPt": [
+        395.68077087402344,
+        483.4689483642578
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t3-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.236002533735,
+        25.95637221286903
+      ]
+    },
+    {
+      "turn": 4,
+      "station": 1025,
+      "distanceM": 1024.9887770739963,
+      "labelPdfPt": [
+        187.51677703857422,
+        549.5230407714844
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t4-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24109312770125,
+        25.957241027431955
+      ]
+    },
+    {
+      "turn": 5,
+      "station": 1175,
+      "distanceM": 1174.987134694581,
+      "labelPdfPt": [
+        162.3656005859375,
+        611.9273376464844
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t5-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.2424525287764,
+        25.956807014409208
+      ]
+    },
+    {
+      "turn": 6,
+      "station": 1300,
+      "distanceM": 1299.9857660450684,
+      "labelPdfPt": [
+        107.0920524597168,
+        590.6266784667969
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t6-apex",
+        "t7-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.2434750698735,
+        25.957418058997394
+      ]
+    },
+    {
+      "turn": 7,
+      "station": 1440,
+      "distanceM": 1439.9842331576142,
+      "labelPdfPt": [
+        72.01084899902344,
+        647.56787109375
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t7-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24468057590762,
+        25.956924542145735
+      ]
+    },
+    {
+      "turn": 8,
+      "station": 1546,
+      "distanceM": 1545.9830725428276,
+      "labelPdfPt": [
+        111.80745697021484,
+        683.6845397949219
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t8-apex",
+        "t8-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24448534199317,
+        25.956109073740883
+      ]
+    },
+    {
+      "turn": 9,
+      "station": 2074,
+      "distanceM": 2073.9772913672864,
+      "labelPdfPt": [
+        290.93267822265625,
+        580.7868957519531
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [],
+      "onboardFinding": "No raised/striped kerb identified through this fast kink; road edge lines continue.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23926244625724,
+        25.955911384230873
+      ]
+    },
+    {
+      "turn": 10,
+      "station": 2361,
+      "distanceM": 2360.974148948005,
+      "labelPdfPt": [
+        401.64292907714844,
+        547.57275390625
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [],
+      "onboardFinding": "No raised/striped kerb identified through this fast kink; road edge lines continue.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23651584299516,
+        25.955214803512536
+      ]
+    },
+    {
+      "turn": 11,
+      "station": 3004,
+      "distanceM": 3003.9671086149124,
+      "labelPdfPt": [
+        559.3262023925781,
+        331.8823547363281
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t11-entry",
+        "t11-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23062749277658,
+        25.957305948328052
+      ]
+    },
+    {
+      "turn": 12,
+      "station": 3135,
+      "distanceM": 3134.9656742702227,
+      "labelPdfPt": [
+        487.64013671875,
+        322.2763671875
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t12-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23126944254571,
+        25.958211752624287
+      ]
+    },
+    {
+      "turn": 13,
+      "station": 3259,
+      "distanceM": 3258.9643165699067,
+      "labelPdfPt": [
+        543.9716796875,
+        287.53746032714844
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t13-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.230189295261,
+        25.958517675581906
+      ]
+    },
+    {
+      "turn": 14,
+      "station": 3341,
+      "distanceM": 3340.9634187358265,
+      "labelPdfPt": [
+        540.67822265625,
+        239.65253448486328
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t14-entry",
+        "t14-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.22976662524977,
+        25.959122479701712
+      ]
+    },
+    {
+      "turn": 15,
+      "station": 3372,
+      "distanceM": 3371.963079310747,
+      "labelPdfPt": [
+        512.0769653320312,
+        260.2365264892578
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t15-apex",
+        "t15-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.23000932035664,
+        25.959275369341135
+      ]
+    },
+    {
+      "turn": 16,
+      "station": 3466,
+      "distanceM": 3465.9620500863134,
+      "labelPdfPt": [
+        508.0736999511719,
+        204.31636810302734
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t16-entry",
+        "t16-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.22986204883976,
+        25.960078889227937
+      ]
+    },
+    {
+      "turn": 17,
+      "station": 4787,
+      "distanceM": 4786.947586198264,
+      "labelPdfPt": [
+        42.280046463012695,
+        482.8964080810547
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t17-entry",
+        "t17-apex",
+        "t17-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24299043848082,
+        25.960499640089175
+      ]
+    },
+    {
+      "turn": 18,
+      "station": 4931,
+      "distanceM": 4930.946009514025,
+      "labelPdfPt": [
+        113.93596649169922,
+        496.27313232421875
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "t18-apex"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24193406283511,
+        25.959734938718253
+      ]
+    },
+    {
+      "turn": 19,
+      "station": 5116,
+      "distanceM": 5115.943983912746,
+      "labelPdfPt": [
+        169.4906234741211,
+        445.6946258544922
+      ],
+      "reviewStatus": "reviewed",
+      "kerbIDs": [
+        "start-t1-entry",
+        "t19-apex-exit"
+      ],
+      "onboardFinding": "Kerb strips visible on the listed sides.",
+      "notes": "Full entry/apex/exit review; geographic positions remain approximate.",
+      "referenceCoordinate": [
+        -80.24019008535655,
+        25.960220830160697
+      ]
+    }
+  ],
+  "boundaryGuides": [
+    {
+      "id": "t9-left-road-edge",
+      "side": "left",
+      "startM": 1830,
+      "endM": 2240,
+      "anchors": [
+        {
+          "distanceM": 1830,
+          "offsetM": 9
+        },
+        {
+          "distanceM": 1900,
+          "offsetM": 8.5
+        },
+        {
+          "distanceM": 1950,
+          "offsetM": 4.75
+        },
+        {
+          "distanceM": 2000,
+          "offsetM": 2.75
+        },
+        {
+          "distanceM": 2050,
+          "offsetM": 3.5
+        },
+        {
+          "distanceM": 2100,
+          "offsetM": 6
+        },
+        {
+          "distanceM": 2150,
+          "offsetM": 6.25
+        },
+        {
+          "distanceM": 2200,
+          "offsetM": 8
+        },
+        {
+          "distanceM": 2240,
+          "offsetM": 8
+        }
+      ],
+      "evidence": "Observed white racing boundary in aerial/profile atlas; turquoise apron detection was outside the road."
+    },
+    {
+      "id": "start-left-road-edge",
+      "side": "left",
+      "startM": 5285,
+      "endM": 5428,
+      "anchors": [
+        {
+          "distanceM": 5285,
+          "offsetM": 6
+        },
+        {
+          "distanceM": 5340,
+          "offsetM": 6.75
+        },
+        {
+          "distanceM": 5380,
+          "offsetM": 7
+        },
+        {
+          "distanceM": 5428,
+          "offsetM": 7.75
+        }
+      ],
+      "evidence": "Observed white racing boundary in aerial/profile atlas; turquoise apron detection was outside the road."
+    },
+    {
+      "id": "north-straight-right-road-edge",
+      "side": "right",
+      "startM": 3540,
+      "endM": 3970,
+      "anchors": [
+        {
+          "distanceM": 3540,
+          "offsetM": 4
+        },
+        {
+          "distanceM": 3580,
+          "offsetM": 3.5
+        },
+        {
+          "distanceM": 3600,
+          "offsetM": 3.25
+        },
+        {
+          "distanceM": 3700,
+          "offsetM": 3.5
+        },
+        {
+          "distanceM": 3750,
+          "offsetM": 4
+        },
+        {
+          "distanceM": 3800,
+          "offsetM": 4.75
+        },
+        {
+          "distanceM": 3850,
+          "offsetM": 5.25
+        },
+        {
+          "distanceM": 3900,
+          "offsetM": 5.75
+        },
+        {
+          "distanceM": 3940,
+          "offsetM": 5.5
+        },
+        {
+          "distanceM": 3970,
+          "offsetM": 5
+        }
+      ],
+      "evidence": "Full-lap aerial/profile review: observed white road boundary; apron or grass detections beyond it rejected."
+    },
+    {
+      "id": "t9-right-road-edge",
+      "side": "right",
+      "startM": 1840,
+      "endM": 2240,
+      "anchors": [
+        {
+          "distanceM": 1840,
+          "offsetM": 5
+        },
+        {
+          "distanceM": 1900,
+          "offsetM": 6.5
+        },
+        {
+          "distanceM": 1950,
+          "offsetM": 9
+        },
+        {
+          "distanceM": 2000,
+          "offsetM": 11.75
+        },
+        {
+          "distanceM": 2030,
+          "offsetM": 10
+        },
+        {
+          "distanceM": 2050,
+          "offsetM": 9.5
+        },
+        {
+          "distanceM": 2080,
+          "offsetM": 8.25
+        },
+        {
+          "distanceM": 2100,
+          "offsetM": 7.25
+        },
+        {
+          "distanceM": 2150,
+          "offsetM": 7.5
+        },
+        {
+          "distanceM": 2200,
+          "offsetM": 6.75
+        },
+        {
+          "distanceM": 2240,
+          "offsetM": 7.5
+        }
+      ],
+      "evidence": "Full-lap aerial/profile review: observed white road boundary; apron or grass detections beyond it rejected."
+    }
+  ],
+  "occlusions": [
+    {
+      "startM": 436,
+      "endM": 464,
+      "reason": "Turn 3 pedestrian bridge and its shadow"
+    },
+    {
+      "startM": 1298,
+      "endM": 1316,
+      "reason": "Turn 6 pedestrian bridge and its shadow"
+    },
+    {
+      "startM": 1594,
+      "endM": 1608,
+      "reason": "Turn 8 exit pedestrian bridge"
+    },
+    {
+      "startM": 2435,
+      "endM": 2449,
+      "reason": "South straight pedestrian bridge"
+    },
+    {
+      "startM": 3235,
+      "endM": 3248,
+      "reason": "Turn 13 pedestrian bridge"
+    },
+    {
+      "startM": 3375,
+      "endM": 3402,
+      "reason": "Turn 15 freeway overpass and shadow"
+    },
+    {
+      "startM": 3480,
+      "endM": 3550,
+      "reason": "Turn 16 freeway overpass and shadow"
+    },
+    {
+      "startM": 5150,
+      "endM": 5173,
+      "reason": "Turn 19 pedestrian bridge and shadow"
+    }
+  ]
+}

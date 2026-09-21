@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "stint-landing",
+  "name": "blau-stint",
+  "account_id": "2b04333c55d653550f69d1c732b92d98",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-09-01",
   "compatibility_flags": ["nodejs_compat"],
