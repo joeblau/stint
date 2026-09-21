@@ -1,3 +1,4 @@
 node_modules/
 data/
 geometry/imagery/
+__pycache__/

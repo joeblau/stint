@@ -64,7 +64,9 @@ final class CalendarFlyoverTests: XCTestCase {
         press(race)
         let button = app.buttons["flyover-circuit"]
         XCTAssertTrue(button.waitForExistence(timeout: 5))
-        XCTAssertGreaterThan(button.frame.height, 30)
+        XCTAssertTrue(button.isHittable)
+        XCTAssertTrue(app.sliders["flyover-scrub"].exists)
+        XCTAssertTrue(app.buttons["flyover-loop"].exists)
         XCTAssertLessThan(button.frame.maxY, app.buttons["open-calendar-race"].frame.minY)
         attach(app, name: "Flyover button above replay")
         press(button)
