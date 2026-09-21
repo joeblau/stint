@@ -10,16 +10,21 @@ struct SeasonGlobeView: PlatformRepresentable {
     let selected: Int?
     let overviewRequest: UUID
     var flyoverRequest = UUID()
+    var flyoverScrub: FlyoverScrub?
+    var flyoverPaused = false
+    var flyoverLoop = false
+    /// Reports the running pass's progress (0...1), or nil when no pass is active.
+    var onFlyoverProgress: ((Double?) -> Void)?
     let now: Date
     let onSelect: (SeasonRace) -> Void
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     #if os(macOS)
     func makeNSView(context: Context) -> SeasonGlobeSurface { SeasonGlobeSurface(onSelect: onSelect) }
-    func updateNSView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, onComplete: onFlightComplete) }
+    func updateNSView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, scrub: flyoverScrub, paused: flyoverPaused, loop: flyoverLoop, onFlyoverProgress: onFlyoverProgress, onComplete: onFlightComplete) }
     #else
     func makeUIView(context: Context) -> SeasonGlobeSurface { SeasonGlobeSurface(onSelect: onSelect) }
-    func updateUIView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, onComplete: onFlightComplete) }
+    func updateUIView(_ view: SeasonGlobeSurface, context: Context) { view.update(selected: selected, overview: overviewRequest, now: now, active: active, flight: flight, reduceMotion: reduceMotion, flyover: flyoverRequest, scrub: flyoverScrub, paused: flyoverPaused, loop: flyoverLoop, onFlyoverProgress: onFlyoverProgress, onComplete: onFlightComplete) }
     #endif
 }
 
@@ -52,6 +57,8 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     private var lastFlightID: UUID?
     private var onFlightComplete: (() -> Void)?
     private var flightStyleIsGlobe = true
+    private var flightStyleSatellite = true
+    private var flightStyleMiami = false
     private var markerSignatures: [UInt64] = Array(repeating: 0, count: Season2026.races.count)
     private var projection: GlobeProjection.Camera?
     private let venues = Season2026.races.map { (race: $0, vertex: GlobeVertex($0.point.coordinate)) }
@@ -72,9 +79,16 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     private var flownItinerary: GlobeItinerary?
     private var reduceMotion = false
     /// The cinematic pass over the selected circuit, started by a second click on its pin.
-    private var flyover: (pass: TrackFlyover, began: TimeInterval, start: MKMapCamera)?
+    private var flyover: (pass: TrackFlyover, began: TimeInterval, start: MKMapCamera, pausedElapsed: Double?)?
+    private var flyoverPerspectiveDistance: Double?
     private var lastFlyoverRequest: UUID?
+    private var lastFlyoverScrub: UUID?
+    private var flyoverLoop = false
+    private var onFlyoverProgress: ((Double?) -> Void)?
     var isFlyingOver: Bool { flyover != nil }
+    #if os(macOS)
+    private var cameraInputMonitor: Any?
+    #endif
 
 
 
@@ -94,6 +108,18 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         map.isRotateEnabled = false
         map.pointOfInterestFilter = .excludingAll
         map.delegate = self
+        #if !os(macOS)
+        let gestures: [UIGestureRecognizer] = [
+            UIPanGestureRecognizer(target: self, action: #selector(manualCameraGesture(_:))),
+            UIPinchGestureRecognizer(target: self, action: #selector(manualCameraGesture(_:))),
+            UIRotationGestureRecognizer(target: self, action: #selector(manualCameraGesture(_:)))
+        ]
+        for gesture in gestures {
+            gesture.cancelsTouchesInView = false
+            gesture.delegate = self
+            map.addGestureRecognizer(gesture)
+        }
+        #endif
         addSubview(map)
         sceneView.scene = scene
         sceneView.backgroundColor = .clear
@@ -196,6 +222,7 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         } else {
             displayClock.stop()
             cancelPlaneFlight()
+            cancelFlyover()
         }
     }
 
@@ -207,7 +234,22 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     #if os(macOS)
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        if let cameraInputMonitor { NSEvent.removeMonitor(cameraInputMonitor) }
+        cameraInputMonitor = nil
+        if window != nil {
+            cameraInputMonitor = NSEvent.addLocalMonitorForEvents(matching: [.leftMouseDragged, .scrollWheel, .magnify, .rotate]) { [weak self] event in
+                if let self, event.window === self.window,
+                   self.map.bounds.contains(self.map.convert(event.locationInWindow, from: nil)) {
+                    self.beginManualCameraMovement()
+                }
+                return event
+            }
+        }
         if window == nil { displayClock.stop() } else { startDisplayClock() }
+    }
+
+    deinit {
+        if let cameraInputMonitor { NSEvent.removeMonitor(cameraInputMonitor) }
     }
     #else
     override func didMoveToWindow() {
@@ -219,10 +261,39 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     func displayFrame(at now: TimeInterval) {
         guard active else { return }
         if let flyover {
-            let elapsed = now - flyover.began
-            map.setCamera(flyover.pass.camera(at: elapsed, from: flyover.start), animated: false)
+            let elapsed = flyover.pausedElapsed ?? (now - flyover.began)
+            let requested = flyover.pass.camera(at: elapsed, from: flyover.start)
+            let chasing = elapsed >= TrackFlyover.settleDuration + TrackFlyover.blendDuration
+                && elapsed < TrackFlyover.settleDuration + flyover.pass.lapDuration
+            if chasing, let flyoverPerspectiveDistance {
+                requested.centerCoordinateDistance = flyoverPerspectiveDistance
+            }
+            map.setCamera(requested, animated: false)
+            if chasing {
+                if map.camera.pitch < 1 {
+                    // Some locations clamp extreme zoom to overhead-only. Recover the
+                    // lowest perspective range, as in the race map's close-follow camera.
+                    requested.centerCoordinateDistance = 100
+                    map.setCamera(requested, animated: false)
+                    // Reuse the supported range instead of bouncing through an overhead
+                    // camera on every display frame. Native terrain clamping still applies.
+                    flyoverPerspectiveDistance = map.camera.centerCoordinateDistance
+                }
+                // Native clamping can move the camera target. Preserve the track anchor
+                // while accepting the locally supported distance and pitch.
+                let accepted = map.camera.copy() as! MKMapCamera
+                if abs(accepted.centerCoordinate.latitude - requested.centerCoordinate.latitude) > 0.00000001
+                    || abs(accepted.centerCoordinate.longitude - requested.centerCoordinate.longitude) > 0.00000001 {
+                    accepted.centerCoordinate = requested.centerCoordinate
+                    map.setCamera(accepted, animated: false)
+                }
+            }
             needsRedraw = true
-            if elapsed >= flyover.pass.duration { cancelFlyover() }
+            onFlyoverProgress?(min(1, max(0, elapsed / flyover.pass.duration)))
+            if elapsed >= flyover.pass.duration, flyover.pausedElapsed == nil {
+                if flyoverLoop { self.flyover?.began = now }
+                else { cancelFlyover() }
+            }
         }
         if let flight = currentFlight {
             let progress = min(1, (now - flight.began) / max(0.001, flight.request.duration))
@@ -364,11 +435,15 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
         let style: UIUserInterfaceStyle = (!globe && day) ? .light : .dark
         if map.overrideUserInterfaceStyle != style { map.overrideUserInterfaceStyle = style }
         #endif
-        guard flightStyleIsGlobe != globe else { return }
+        let miami = MiamiSurfacePolicy.isEnabled(circuitID: edgeCircuitID)
+        guard flightStyleIsGlobe != globe || flightStyleSatellite != satellite || flightStyleMiami != miami else { return }
         flightStyleIsGlobe = globe
+        flightStyleSatellite = satellite
+        flightStyleMiami = miami
+        let elevation = MiamiSurfacePolicy.elevation(circuitID: edgeCircuitID)
         if globe { map.preferredConfiguration = MKImageryMapConfiguration(elevationStyle: .realistic) }
-        else if satellite { map.preferredConfiguration = MKImageryMapConfiguration(elevationStyle: .flat) }
-        else { map.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: .flat, emphasisStyle: .muted) }
+        else if satellite { map.preferredConfiguration = MKImageryMapConfiguration(elevationStyle: elevation) }
+        else { map.preferredConfiguration = MKStandardMapConfiguration(elevationStyle: elevation, emphasisStyle: .muted) }
         map.showsBuildings = !globe && !satellite
     }
 
@@ -388,10 +463,14 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
     }
 
     func update(selected: Int?, overview: UUID, now: Date, active: Bool, flight: MapFlight?, reduceMotion: Bool,
-                flyover flyoverRequest: UUID? = nil, onComplete: @escaping () -> Void) {
+                flyover flyoverRequest: UUID? = nil, scrub: FlyoverScrub? = nil, paused: Bool = false, loop: Bool = false,
+                onFlyoverProgress: ((Double?) -> Void)? = nil, onComplete: @escaping () -> Void) {
+        updateCircuitEdges(selected: selected)
         setActive(active)
         onFlightComplete = onComplete
+        self.onFlyoverProgress = onFlyoverProgress
         self.reduceMotion = reduceMotion
+        flyoverLoop = loop
         // The card's "Fly over circuit" button changes this token; the first value seen is the baseline.
         if let flyoverRequest {
             if lastFlyoverRequest == nil {
@@ -399,6 +478,25 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
             } else if lastFlyoverRequest != flyoverRequest {
                 lastFlyoverRequest = flyoverRequest
                 if currentFlight == nil, let race = Season2026.races.first(where: { $0.id == selected }) { startFlyover(race) }
+            }
+        }
+        // Dragging the card's slider rewinds or advances the running pass by shifting its start time.
+        if let scrub, lastFlyoverScrub != scrub.id, let flyover {
+            lastFlyoverScrub = scrub.id
+            let fraction = min(0.999, max(0, scrub.fraction))
+            if flyover.pausedElapsed != nil {
+                self.flyover?.pausedElapsed = fraction * flyover.pass.duration
+            } else {
+                self.flyover?.began = ProcessInfo.processInfo.systemUptime - fraction * flyover.pass.duration
+            }
+        }
+        // Pausing freezes the pass's clock; resuming re-anchors it so no time is skipped.
+        if let flyover {
+            if paused, flyover.pausedElapsed == nil {
+                self.flyover?.pausedElapsed = ProcessInfo.processInfo.systemUptime - flyover.began
+            } else if !paused, let held = flyover.pausedElapsed {
+                self.flyover?.pausedElapsed = nil
+                self.flyover?.began = ProcessInfo.processInfo.systemUptime - held
             }
         }
         if !Calendar.current.isDate(self.now, inSameDayAs: now) { needsRedraw = true }
@@ -475,8 +573,10 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
 
     /// Settle above the circuit, chase one lap along the centerline, then pull back.
     func startFlyover(_ race: SeasonRace) {
+        updateCircuitEdges(selected: race.id)
         guard let circuit = try? race.circuit.loadCircuit() else { return }
         cancelPlaneFlight()
+        flyoverPerspectiveDistance = nil
         let pass = TrackFlyover(circuit: circuit)
         if reduceMotion, ProcessInfo.processInfo.environment["STINT_FORCE_FLIGHT"] != "1" {
             let overview = pass.overviewCamera
@@ -486,7 +586,8 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
             return
         }
         map.isPitchEnabled = true
-        flyover = (pass, ProcessInfo.processInfo.systemUptime, map.camera.copy() as! MKMapCamera)
+        map.isRotateEnabled = true
+        flyover = (pass, ProcessInfo.processInfo.systemUptime, map.camera.copy() as! MKMapCamera, nil)
         setMapAccessibilityLabel("Flying over \(race.circuit.title)")
         needsRedraw = true
         startDisplayClock()
@@ -494,8 +595,54 @@ final class SeasonGlobeSurface: PlatformView, MKMapViewDelegate {
 
     private func cancelFlyover() {
         flyover = nil
+        flyoverPerspectiveDistance = nil
         setMapAccessibilityLabel(nil)
+        onFlyoverProgress?(nil)
     }
+
+    private var edgeCircuitID: String?
+
+    private func updateCircuitEdges(selected: Int?) {
+        let id = Season2026.races.first(where: { $0.id == selected })?.circuitID
+        guard id != edgeCircuitID else { return }
+        edgeCircuitID = id
+        if !flightStyleIsGlobe {
+            map.preferredConfiguration.elevationStyle = MiamiSurfacePolicy.elevation(circuitID: id)
+        }
+        map.removeOverlays(map.overlays.filter { $0 is CircuitEdgeOverlay || $0 is CircuitAsphaltOverlay || $0 is TrackSurfaceOverlay })
+        guard let id, let race = Season2026.races.first(where: { $0.circuitID == id }),
+              let circuit = try? race.circuit.loadCircuit() else { return }
+        let document = try? CircuitEdgeDocument.load(circuitID: id)
+        map.addOverlays(CircuitTrackOverlays.make(document: document, circuit: circuit), level: .aboveRoads)
+    }
+
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if let asphalt = overlay as? CircuitAsphaltOverlay { return CircuitAsphaltRenderer(asphalt: asphalt) }
+        if let track = overlay as? TrackSurfaceOverlay { return TrackSurfaceRenderer(track: track) }
+        if let edge = overlay as? CircuitEdgeOverlay {
+            let renderer = CircuitEdgeRenderer(edge: edge)
+            #if os(macOS)
+            renderer.displayScale = mapView.window?.backingScaleFactor ?? 2
+            #else
+            renderer.displayScale = mapView.window?.screen.scale ?? 2
+            #endif
+            return renderer
+        }
+        return MKOverlayRenderer(overlay: overlay)
+    }
+
+    /// Give the displayed camera to MapKit when the user starts exploring.
+    func beginManualCameraMovement() {
+        guard flyover != nil else { return }
+        cancelFlyover()
+        needsRedraw = true
+    }
+
+    #if !os(macOS)
+    @objc private func manualCameraGesture(_ gesture: UIGestureRecognizer) {
+        if gesture.state == .began || gesture.state == .changed { beginManualCameraMovement() }
+    }
+    #endif
 
     /// Announces the pass on the selected pin for assistive technology and UI tests while it runs.
     private func setMapAccessibilityLabel(_ label: String?) {
@@ -733,3 +880,10 @@ private final class PassthroughSceneView: SCNView {
     override func hitTest(_ point: NSPoint) -> NSView? { nil }
     #endif
 }
+
+#if !os(macOS)
+extension SeasonGlobeSurface: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool { true }
+}
+#endif

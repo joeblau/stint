@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { alignClosedLoops, applyTransform, fitSimilarity, parseCircuitGeojson, parseTumftmCsv, resampleClosed, synthesizeKerbs, type CenterlinePoint } from "../src/trackimport";
+import { alignClosedLoops, applyTransform, densifyClosed, fitSimilarity, parseCircuitGeojson, parseTumftmCsv, projectLonLat, resampleClosed, synthesizeKerbs, unprojectToLonLat, type CenterlinePoint, type GeoOrigin } from "../src/trackimport";
 
 // Asymmetric closed loop (rounded triangle-ish blob) so phase and direction are identifiable.
 const loop: CenterlinePoint[] = Array.from({length: 720}, (_, i) => {
@@ -24,14 +24,64 @@ test("circuit GeoJSON projects equirectangularly and applies constant width", ()
   const doc = JSON.stringify({type: "FeatureCollection", features: [{type: "Feature",
     properties: {id: "test", Name: "Test Circuit", length: 1000},
     geometry: {type: "LineString", coordinates: [square(-.001, -.001), square(.001, -.001), square(.001, .001), square(-.001, .001)]}}]});
-  const {name, lengthM, points} = parseCircuitGeojson(doc, 11);
+  const {name, lengthM, origin, points} = parseCircuitGeojson(doc, 11);
   expect(name).toBe("Test Circuit"); expect(lengthM).toBe(1000);
+  expect(origin.lat0).toBeCloseTo(43.7, 9); expect(origin.lon0).toBeCloseTo(7.4, 9);
   for (const p of points) {expect(p.wr).toBe(5.5); expect(p.wl).toBe(5.5);}
   const dy = points[2].y - points[1].y, dx = points[1].x - points[0].x;
   expect(dy).toBeCloseTo(2 * .001 * Math.PI * 6378137 / 180, 3);
   expect(dx).toBeCloseTo(dy * Math.cos(43.7 * Math.PI / 180), 3);
   expect(Math.abs(points[0].x + points[2].x)).toBeLessThan(1e-9); // centered on mean lon
   expect(() => parseCircuitGeojson(doc, 2)).toThrow(/4\.\.30/);
+});
+
+test("equirectangular projection round-trips lon/lat through local meters", () => {
+  const origin: GeoOrigin = {lat0: 34.8431, lon0: 136.541}; // Suzuka-ish
+  for (const [lon, lat] of [[136.541, 34.8431], [136.55, 34.85], [136.53, 34.84], [-80.237, 25.959], [4.5405, 52.3884]]) {
+    const xy = projectLonLat(lon, lat, origin);
+    const back = unprojectToLonLat(xy.x, xy.y, origin);
+    expect(back.lon).toBeCloseTo(lon, 10);
+    expect(back.lat).toBeCloseTo(lat, 10);
+  }
+  // 1 degree of latitude is METERS_PER_DEGREE everywhere; longitude shrinks by cos(lat0).
+  const north = projectLonLat(origin.lon0, origin.lat0 + 1, origin);
+  expect(north.y).toBeCloseTo(Math.PI * 6378137 / 180, 6);
+  const east = projectLonLat(origin.lon0 + 1, origin.lat0, origin);
+  expect(east.x).toBeCloseTo(Math.PI * 6378137 / 180 * Math.cos(origin.lat0 * Math.PI / 180), 6);
+});
+
+test("aligned width-source centerline recovers WGS84 of the geo-referenced reference", () => {
+  // Geo-referenced "reference" loop: the test loop projected to fake lon/lat, as parseCircuitGeojson would emit.
+  const origin: GeoOrigin = {lat0: 52.3884, lon0: 4.5405}; // Zandvoort-ish
+  const reference = loop.map(p => {
+    const ll = unprojectToLonLat(p.x, p.y, origin);
+    return {...projectLonLat(ll.lon, ll.lat, origin), wr: 6, wl: 6}; // identity projection; establishes origin plumbing
+  });
+  // Width source: the same loop under a known similarity transform, with measured widths.
+  const known = {scale: 1.02, cos: Math.cos(-.7), sin: Math.sin(-.7), tx: 55, ty: -20};
+  const source: CenterlinePoint[] = loop.map(p => ({...applyTransform(p, known), wr: p.wr, wl: p.wl}));
+  const alignment = alignClosedLoops(source, reference, 720);
+  expect(alignment.rms).toBeLessThan(.5);
+  // The emitted pipeline: transform source points into the reference frame, then unproject to WGS84.
+  for (const i of [0, 200, 500]) {
+    const q = applyTransform(source[i], alignment.transform);
+    const ll = unprojectToLonLat(q.x, q.y, origin);
+    const expected = unprojectToLonLat(loop[i].x, loop[i].y, origin);
+    expect(ll.lat).toBeCloseTo(expected.lat, 5); // ~1 m at mid latitudes
+    expect(ll.lon).toBeCloseTo(expected.lon, 5);
+  }
+});
+
+test("densifyClosed caps segment length and interpolates widths", () => {
+  const square: CenterlinePoint[] = [{x: 0, y: 0, wr: 5, wl: 7}, {x: 100, y: 0, wr: 9, wl: 11}, {x: 100, y: 100, wr: 5, wl: 7}, {x: 0, y: 100, wr: 5, wl: 7}];
+  const dense = densifyClosed(square, 25);
+  expect(dense.length).toBe(16);
+  for (let i = 0; i < dense.length; i++) {
+    const a = dense[i], b = dense[(i + 1) % dense.length];
+    expect(Math.hypot(b.x - a.x, b.y - a.y)).toBeLessThanOrEqual(25);
+  }
+  const mid = dense[2]; // halfway along the first edge
+  expect(mid).toEqual({x: 50, y: 0, wr: 7, wl: 9});
 });
 
 test("alignment recovers a known similarity transform despite start-index rotation and reversal", () => {

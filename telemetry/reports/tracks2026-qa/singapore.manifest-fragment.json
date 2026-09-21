@@ -1,0 +1,19 @@
+{
+  "id": "singapore",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 55
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 55,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 28,
+  "measuredWidthRangeM": [
+    9.75,
+    29
+  ],
+  "pctMeasured": 73.1,
+  "imageryMeasuredAt": "2026-09-08T07:40:41.163Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T07:40:41.163Z: 55 tiles, mosaic 2816x2048 px, zoom 18 (~0.60 m/px at track latitude). 73.1% of 990 stations measured at confidence>=0.45 (202 continuity-guided), 237 interpolated over <=60 m bridges, 29 fell back to prior widths (24 dark/shadow-suspect stations). Measured full-width range 9.8-29.0 m (median 19.0 m). Kerbs: 0/28 strips imagery-detected."
+}

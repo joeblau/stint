@@ -27,6 +27,8 @@ final class RaceSession {
     var lighting = RaceLighting.raceTime
     @ObservationIgnored private var lightingCache: (revision: UUID, circuit: String?, minute: Int, day: Bool)?
     private(set) var timing: RaceTiming?
+    /// Side-by-side placement, derived with `timing` off the main actor.
+    private(set) var formation: RaceFormation?
     @ObservationIgnored private var timingTask: Task<Void, Never>?
     var followsHeading = true
     var tilted = true
@@ -76,10 +78,17 @@ final class RaceSession {
         return rows
     }
     var positions: [CarPosition] {
+        _ = formation // Observe placement becoming available even when a snapshot is cached.
         if let cache = positionsCache, cache.revision == revision, cache.time == time { return cache.positions }
-        let positions = replay?.recordings.map { $0.position(at: time) } ?? []
+        let positions = self.positions(at: time)
         positionsCache = (revision, time, positions)
         return positions
+    }
+
+    /// Every car at `time`, with inferred side-by-side placement once the formation index is ready.
+    func positions(at time: Double) -> [CarPosition] {
+        let raw = replay?.recordings.map { $0.position(at: time) } ?? []
+        return formation?.place(raw, at: time) ?? raw
     }
     var selectedPosition: CarPosition? { positions.first { $0.id == selectedDriverID } }
     var standings: [CarPosition] {
@@ -128,16 +137,25 @@ final class RaceSession {
     private func prepareTiming(replay: RaceReplay) {
         timingTask?.cancel()
         timing = nil
+        formation = nil
         rowsCache = nil
+        positionsCache = nil
+        standingsCache = nil
         let expectedRevision = revision
         timingTask = Task { [weak self] in
-            let worker = Task.detached(priority: .utility) { RaceTiming(replay: replay) }
+            let worker = Task.detached(priority: .utility) { () -> (RaceTiming, RaceFormation) in
+                let timing = RaceTiming(replay: replay)
+                return (timing, RaceFormation(replay: replay, timing: timing))
+            }
             let result = await withTaskCancellationHandler {
                 await worker.value
             } onCancel: { worker.cancel() }
             guard !Task.isCancelled, let self, self.revision == expectedRevision else { return }
             self.rowsCache = nil
-            self.timing = result
+            self.positionsCache = nil
+            self.standingsCache = nil
+            self.timing = result.0
+            self.formation = result.1
         }
     }
 

@@ -1,0 +1,19 @@
+{
+  "id": "yas-marina",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 63
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 63,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 22,
+  "measuredWidthRangeM": [
+    11.5,
+    29.25
+  ],
+  "pctMeasured": 75.6,
+  "imageryMeasuredAt": "2026-09-08T08:06:47.710Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T08:06:47.710Z: 63 tiles, mosaic 1792x3584 px, zoom 18 (~0.54 m/px at track latitude). 75.6% of 1060 stations measured at confidence>=0.45 (185 continuity-guided), 168 interpolated over <=60 m bridges, 91 fell back to prior widths (110 dark/shadow-suspect stations). Measured full-width range 11.5-29.3 m (median 16.8 m). Kerbs: 0/22 strips imagery-detected."
+}

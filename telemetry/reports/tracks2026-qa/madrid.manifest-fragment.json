@@ -1,0 +1,16 @@
+{
+  "id": "madrid",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 99
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 99,
+  "widthProvenance": "constant-default",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 38,
+  "measuredWidthRangeM": null,
+  "pctMeasured": 0,
+  "imageryMeasuredAt": "2026-09-08T07:42:29.075Z",
+  "imageryNotes": "CONSTANT-DEFAULT FALLBACK (--constant-default): available Esri imagery predates circuit construction, so no width/kerb measurement was attempted; prior constant-default widths kept at every station and all kerbs remain synthetic. Imagery measurement 2026-09-08T07:42:29.075Z: 99 tiles, mosaic 3072x4352 px, zoom 18 (~0.45 m/px at track latitude). 0.0% of 1087 stations measured at confidence>=0.45 (160 continuity-guided), 0 interpolated over <=60 m bridges, 1087 fell back to prior widths (4 dark/shadow-suspect stations). No confident measurements. Kerbs: 0/38 strips imagery-detected."
+}

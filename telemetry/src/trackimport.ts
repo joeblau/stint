@@ -192,12 +192,18 @@ export function curvatureProfile(points: {x: number; y: number}[], smoothing = 3
   return {kappa, ds};
 }
 
-/** Synthetic kerb strips from centerline curvature: an inside strip around each corner apex and an outside
- *  strip at each corner exit, ~widthM wide, offset outward from the track edge. NOT measured geometry. */
-export function synthesizeKerbs(loop: CenterlinePoint[], options: {minCurvature?: number; widthM?: number; minCornerM?: number; mergeGapM?: number} = {}): KerbStrip[] {
-  const kMin = options.minCurvature ?? 0.012, widthM = options.widthM ?? 2;
+export interface CornerZoneSpan {
+  corner: number; kind: "apex-inside" | "exit-outside"; side: "left" | "right";
+  cornerDirection: "left" | "right";
+  /** Index span into the (closed, uniformly resampled) loop; `to` may exceed loop length (wraps). */
+  from: number; to: number;
+}
+
+/** Corner zones from centerline curvature: the runs used for kerb synthesis, as index spans. */
+export function cornerZoneSpans(loop: CenterlinePoint[], options: {minCurvature?: number; minCornerM?: number; mergeGapM?: number} = {}): CornerZoneSpan[] {
+  const kMin = options.minCurvature ?? 0.012;
   const n = loop.length;
-  if (n < 32) throw new Error("synthesizeKerbs: loop too coarse");
+  if (n < 32) throw new Error("cornerZoneSpans: loop too coarse");
   const {kappa, ds} = curvatureProfile(loop);
   const inCorner = kappa.map(k => Math.abs(k) >= kMin);
   const minLen = Math.max(2, Math.round((options.minCornerM ?? 15) / ds));
@@ -223,33 +229,47 @@ export function synthesizeKerbs(loop: CenterlinePoint[], options: {minCurvature?
       runs.push([at, len]); i += len;
     } else i++;
   }
-  const kerbs: KerbStrip[] = [];
+  const zones: CornerZoneSpan[] = [];
   let corner = 0;
   for (const [start, len] of runs) {
     if (len < minLen) continue;
     corner++;
-    const at = (k: number) => loop[(start + k) % n];
     const sign = Math.sign(Array.from({length: len}, (_, k) => kappa[(start + k) % n]).reduce((a, b) => a + b, 0)) || 1;
     let apex = 0, peak = 0;
     for (let k = 0; k < len; k++) if (Math.abs(kappa[(start + k) % n]) > peak) {peak = Math.abs(kappa[(start + k) % n]); apex = k;}
+    const inside = sign > 0 ? "left" : "right", outside = sign > 0 ? "right" : "left";
+    const halfApex = Math.max(2, Math.min(Math.round(len / 4), Math.round(25 / ds)));
+    zones.push({corner, kind: "apex-inside", side: inside, cornerDirection: sign > 0 ? "left" : "right",
+      from: start + Math.max(0, apex - halfApex), to: start + Math.min(len - 1, apex + halfApex)});
+    const exitBack = Math.max(2, Math.min(Math.round(len * .3), Math.round(30 / ds))), exitFwd = Math.round(10 / ds);
+    zones.push({corner, kind: "exit-outside", side: outside, cornerDirection: sign > 0 ? "left" : "right",
+      from: start + Math.max(0, len - 1 - exitBack), to: start + len - 1 + exitFwd});
+  }
+  return zones;
+}
+
+/** Synthetic kerb strips from centerline curvature: an inside strip around each corner apex and an outside
+ *  strip at each corner exit, ~widthM wide, offset outward from the track edge. NOT measured geometry. */
+export function synthesizeKerbs(loop: CenterlinePoint[], options: {minCurvature?: number; widthM?: number; minCornerM?: number; mergeGapM?: number} = {}): KerbStrip[] {
+  const widthM = options.widthM ?? 2;
+  const n = loop.length;
+  if (n < 32) throw new Error("synthesizeKerbs: loop too coarse");
+  const {ds} = curvatureProfile(loop);
+  const kerbs: KerbStrip[] = [];
+  for (const zone of cornerZoneSpans(loop, options)) {
+    const at = (k: number) => loop[k % n];
     const normals = (k: number) => {
       const a = at(k), b = at(k + 1), h = Math.hypot(b.x - a.x, b.y - a.y) || 1;
       return {left: {x: -(b.y - a.y) / h, y: (b.x - a.x) / h}, right: {x: (b.y - a.y) / h, y: -(b.x - a.x) / h}};
     };
-    const strip = (from: number, to: number, side: "left" | "right", kind: KerbStrip["kind"]): KerbStrip => {
-      const inner: {x: number; y: number}[] = [], outer: {x: number; y: number}[] = [];
-      for (let k = from; k <= to; k++) {
-        const p = at(k), normal = normals(k)[side], edge = side === "left" ? p.wl : p.wr;
-        inner.push({x: p.x + normal.x * edge, y: p.y + normal.y * edge});
-        outer.push({x: p.x + normal.x * (edge + widthM), y: p.y + normal.y * (edge + widthM)});
-      }
-      return {id: `corner-${corner}-${kind}`, corner, kind, side, cornerDirection: sign > 0 ? "left" : "right", widthM, polygon: [...inner, ...outer.reverse()]};
-    };
-    const inside = sign > 0 ? "left" : "right", outside = sign > 0 ? "right" : "left";
-    const halfApex = Math.max(2, Math.min(Math.round(len / 4), Math.round(25 / ds)));
-    kerbs.push(strip(Math.max(0, apex - halfApex), Math.min(len - 1, apex + halfApex), inside, "apex-inside"));
-    const exitBack = Math.max(2, Math.min(Math.round(len * .3), Math.round(30 / ds))), exitFwd = Math.round(10 / ds);
-    kerbs.push(strip(Math.max(0, len - 1 - exitBack), len - 1 + exitFwd, outside, "exit-outside"));
+    const inner: {x: number; y: number}[] = [], outer: {x: number; y: number}[] = [];
+    for (let k = zone.from; k <= zone.to; k++) {
+      const p = at(k), normal = normals(k)[zone.side], edge = zone.side === "left" ? p.wl : p.wr;
+      inner.push({x: p.x + normal.x * edge, y: p.y + normal.y * edge});
+      outer.push({x: p.x + normal.x * (edge + widthM), y: p.y + normal.y * (edge + widthM)});
+    }
+    kerbs.push({id: `corner-${zone.corner}-${zone.kind}`, corner: zone.corner, kind: zone.kind, side: zone.side,
+      cornerDirection: zone.cornerDirection, widthM, polygon: [...inner, ...outer.reverse()]});
   }
   return kerbs;
 }

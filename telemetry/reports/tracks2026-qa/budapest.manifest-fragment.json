@@ -1,0 +1,19 @@
+{
+  "id": "budapest",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 98
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 98,
+  "widthProvenance": "esri-imagery+default-fallback",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 24,
+  "measuredWidthRangeM": [
+    7.75,
+    17
+  ],
+  "pctMeasured": 32,
+  "imageryMeasuredAt": "2026-09-08T08:09:02.840Z",
+  "imageryNotes": "Paved-apron overshoot guard (--max-full-width 16 m): 467 stations whose measured full width exceeded the cap were treated as unmeasured and fell back to prior widths. Imagery measurement 2026-09-08T08:09:02.840Z: 98 tiles, mosaic 3072x3584 px, zoom 18 (~0.40 m/px at track latitude). 32.0% of 875 stations measured at confidence>=0.45 (90 continuity-guided), 260 interpolated over <=60 m bridges, 335 fell back to prior widths (0 dark/shadow-suspect stations). Measured full-width range 7.8-17.0 m (median 12.3 m). TUMFTM cross-validation over 280 measured stations: Pearson r=0.665, mean |Δ full width|=1.27 m. Kerbs: 0/24 strips imagery-detected."
+}

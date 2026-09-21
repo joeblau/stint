@@ -1,0 +1,16 @@
+{
+  "id": "las-vegas",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 109
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 109,
+  "widthProvenance": "constant-default",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 26,
+  "measuredWidthRangeM": null,
+  "pctMeasured": 0,
+  "imageryMeasuredAt": "2026-09-08T08:00:00.214Z",
+  "imageryNotes": "Imagery measurement attempted 2026-09-08 and rejected (constant-default fallback). Esri World Imagery z18 (~0.48 m/px), 109 tiles, mosaic 3072x4608 px. The detector found edges at 47.3% of 1246 stations (357 interpolated, 300 fell back, 212 dark/shadow-suspect) with measured full-width range 8.0-28.5 m, median 20.8 m — on the street sections (Las Vegas Blvd, Sands/Spring Mountain/Koval/Harmon) this is the full public-road width curb-to-curb, not the race-week fenced racing corridor (~12 m nominal), which is not distinguishable in imagery. Applying it would write confidently wrong widths, so the constant 12 m default was retained (honest fallback, mirroring the madrid policy). Kerbs: 0/16 strips imagery-detected; all 26 strips curvature-synthetic. QA render tracks2026-qa/las-vegas.png retained as documentation of the attempt."
+}

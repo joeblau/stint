@@ -1,0 +1,19 @@
+{
+  "id": "mexico-city",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 57
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 57,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 24,
+  "measuredWidthRangeM": [
+    7.5,
+    29.5
+  ],
+  "pctMeasured": 89.9,
+  "imageryMeasuredAt": "2026-09-08T07:43:45.794Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T07:43:45.794Z: 57 tiles, mosaic 3072x2304 px, zoom 18 (~0.56 m/px at track latitude). 89.9% of 863 stations measured at confidence>=0.45 (197 continuity-guided), 87 interpolated over <=60 m bridges, 0 fell back to prior widths (33 dark/shadow-suspect stations). Measured full-width range 7.5-29.5 m (median 17.3 m). TUMFTM cross-validation over 776 measured stations: Pearson r=0.080, mean |Δ full width|=5.60 m. Kerbs: 0/24 strips imagery-detected."
+}

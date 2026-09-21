@@ -1,0 +1,19 @@
+{
+  "id": "lusail",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 81
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 81,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "mixed",
+  "kerbStrips": 26,
+  "measuredWidthRangeM": [
+    9.5,
+    29
+  ],
+  "pctMeasured": 56.6,
+  "imageryMeasuredAt": "2026-09-08T08:00:58.870Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T08:00:58.870Z: 81 tiles, mosaic 2816x3072 px, zoom 18 (~0.54 m/px at track latitude). 56.6% of 1085 stations measured at confidence>=0.45 (103 continuity-guided), 184 interpolated over <=60 m bridges, 287 fell back to prior widths (413 dark/shadow-suspect stations). Measured full-width range 9.5-29.0 m (median 15.3 m). Kerbs: 7/26 strips imagery-detected."
+}

@@ -127,11 +127,16 @@ struct DriverRecording: Codable {
     }
 }
 
+/// Where a car is drawn. `point` and `heading` come from the recording; `trackDistance` is the
+/// authoritative position along the lap once timing is derived, and `lateralOffset` is an inferred
+/// visualization value in meters to the right of `heading` (see `RaceFormation`), never telemetry.
 struct CarPosition: Identifiable {
     let driver: Driver
     let point: GeoPoint
     let heading: Double
     let speedKPH: Double?
+    var trackDistance: Double? = nil
+    var lateralOffset: Double = 0
     var racePosition: Int? = nil
     var gapToLeader: Double? = nil
     var throttle: Double? = nil

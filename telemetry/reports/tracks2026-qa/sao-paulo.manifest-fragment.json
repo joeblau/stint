@@ -1,0 +1,19 @@
+{
+  "id": "sao-paulo",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 46
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 46,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "synthetic",
+  "kerbStrips": 20,
+  "measuredWidthRangeM": [
+    6.75,
+    28.25
+  ],
+  "pctMeasured": 54.5,
+  "imageryMeasuredAt": "2026-09-08T07:38:12.058Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T07:38:12.058Z: 46 tiles, mosaic 1536x2304 px, zoom 18 (~0.55 m/px at track latitude). 54.5% of 860 stations measured at confidence>=0.45 (111 continuity-guided), 90 interpolated over <=60 m bridges, 301 fell back to prior widths (339 dark/shadow-suspect stations). Measured full-width range 6.8-28.3 m (median 14.8 m). TUMFTM cross-validation over 469 measured stations: Pearson r=0.121, mean |Δ full width|=4.09 m. Kerbs: 0/20 strips imagery-detected."
+}

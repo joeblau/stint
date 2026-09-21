@@ -1,0 +1,114 @@
+{
+  "zoom": 19,
+  "originPx": [
+    37190567,
+    57079927
+  ],
+  "scale": 1,
+  "size": [
+    7346,
+    3973
+  ],
+  "nativeMetersPerPixel": 0.2684597264334658,
+  "source": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer",
+  "attribution": "Miami-Dade County | GIS Groups",
+  "serviceYearLabel": 2025,
+  "captureDate": "Not supplied by service; other service fields still say 2024",
+  "licenseEvidence": "Miami-Dade County GIS Data Download: For Public Use; provided as-is for illustration. https://www.arcgis.com/home/item.html?id=df9bba0031c0453da91ef55371c697f2",
+  "requests": [
+    {
+      "url": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer/export?bbox=-8933069.195442593%2C2993275.221976068%2C-8931874.866875637%2C2994461.4888251983&bboxSR=3857&imageSR=3857&size=4000%2C3973&format=png24&transparent=false&layers=show%3A6&f=image",
+      "file": "part-0-0.png",
+      "size": [
+        4000,
+        3973
+      ],
+      "offsetPx": [
+        0,
+        0
+      ]
+    },
+    {
+      "url": "https://gisweb.miamidade.gov/arcgis/rest/services/MapCache/MDCImagery_WebMercator/MapServer/export?bbox=-8931874.866875637%2C2993275.221976068%2C-8930875.811029378%2C2994461.4888251983&bboxSR=3857&imageSR=3857&size=3346%2C3973&format=png24&transparent=false&layers=show%3A6&f=image",
+      "file": "part-0-1.png",
+      "size": [
+        3346,
+        3973
+      ],
+      "offsetPx": [
+        4000,
+        0
+      ]
+    }
+  ],
+  "imageSha256": "f1eb73965fe60ab110300c323bb93213cfa7950485bee598af6bb3ce7933eeeb",
+  "licenseMetadata": {
+    "id": "df9bba0031c0453da91ef55371c697f2",
+    "owner": "MD_Apps",
+    "ownerId": "4d2b883239a7570e2072c60ff79f63a3",
+    "orgId": "8Pc9XBTAsYuxx9Ny",
+    "created": 1500397143000,
+    "modified": 1703856871000,
+    "guid": null,
+    "name": null,
+    "title": "GIS Data Download",
+    "type": "Web Mapping Application",
+    "typeKeywords": [
+      "Flex",
+      "Map",
+      "Mapping Site",
+      "Online Map",
+      "Ready To Use",
+      "Web Map"
+    ],
+    "description": "<div>Currently there are almost 100 GIS data files available for free download in shapefile (.zip), DWG and KML format. Please note that use of this data may require some proficiency in GIS and accessibility to GIS software.</div><div>All files are US Feet, North American Datum 1983 (NAD83), State Plane Coordinate System Florida East (FIPS Zone 0901).</div><div>Due to the large size of the file, orthophotography is not available for download, but can be purchased for a fee.</div><div><br /></div><div><font size='3'><span style='font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; background-color: rgb(255, 255, 255);'>To learn more please contact the\u00a0</span><a href='mailto:gis@miamidade.gov?subject=Address%20Search' style='color: rgb(0, 121, 193); text-decoration-line: none; font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; background-color: rgb(255, 255, 255);' target='_blank'>GIS Technical Support Group</a></font><br /></div>",
+    "tags": [
+      "Florida",
+      "Miami-Dade County",
+      "MDC",
+      "County Government",
+      "Local Government",
+      "Data & Services",
+      "GIS Maps & Apps",
+      "Production",
+      "Information Technology Department"
+    ],
+    "snippet": "Allows users to download Miami-Dade County\u2019s public GIS data, more than 100 GIS data files at no cost.\n",
+    "thumbnail": "thumbnail/thumbnail.png",
+    "documentation": null,
+    "extent": [],
+    "categories": [
+      "/Categories/Source Department/Communications and Information Technology Department",
+      "/Categories/Production Content"
+    ],
+    "spatialReference": null,
+    "accessInformation": "GIS Technical Support Group",
+    "classification": null,
+    "licenseInfo": "<div style='font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 17px; background-color: rgb(255, 255, 255);'><font size='5'>For Public Use</font></div><div style='font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 17px; background-color: rgb(255, 255, 255);'><font size='5'><br /></font></div><div style='font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 17px; background-color: rgb(255, 255, 255);'><u>Legal Disclaimer:</u></div><div style='font-family: &quot;Avenir Next W01&quot;, &quot;Avenir Next W00&quot;, &quot;Avenir Next&quot;, Avenir, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 17px; background-color: rgb(255, 255, 255);'><p style='margin-top: 0px; margin-bottom: 1.55rem;'><i><span style='font-size: 10pt; line-height: 15.3333px;'>The Miami-Dade County provides the data for use &quot;as is.&quot; The areas depicted by this map/data are approximate, and are not accurate to surveying or engineering standards.\u00a0 The maps/data shown here are for illustration purposes only and are not suitable for site-specific decision making.\u00a0 Information found here should not be used for making financial or any other commitments.</span></i></p><p style='margin-top: 0px; margin-bottom: 1.55rem;'><i><span style='font-size: 10pt; line-height: 15.3333px;'>\u00a0</span></i><i><span style='font-size: 10pt; line-height: 15.3333px;'>The Miami-Dade County provides this information with the understanding that it is not guaranteed to be accurate, correct or complete and conclusions drawn from such information are the responsibility of the user.\u00a0 While every effort has been made to ensure the accuracy, correctness and timeliness of materials presented, the Miami-Dade County assumes no responsibility for errors or omissions, even if the Miami-Dade County is advised of the possibility of such damage.</span></i></p></div>",
+    "culture": "en-us",
+    "properties": null,
+    "advancedSettings": null,
+    "url": "https://gisweb.miamidade.gov/GISSelfServices/GeographicData/MDGeographicData.html",
+    "proxyFilter": null,
+    "access": "public",
+    "size": 0,
+    "subInfo": 0,
+    "appCategories": [],
+    "industries": [],
+    "languages": [],
+    "largeThumbnail": null,
+    "banner": null,
+    "screenshots": [],
+    "listed": false,
+    "commentsEnabled": false,
+    "numComments": 0,
+    "numRatings": 0,
+    "avgRating": 0,
+    "numViews": 1725,
+    "scoreCompleteness": 100,
+    "groupDesignations": null,
+    "apiToken1ExpirationDate": -1,
+    "apiToken2ExpirationDate": -1,
+    "lastViewed": 1788836400000
+  }
+}

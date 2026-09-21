@@ -1,0 +1,19 @@
+{
+  "id": "jeddah",
+  "imageryZoom": 18,
+  "imageryZooms": {
+    "18": 65
+  },
+  "imageryAttribution": "Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+  "imageryTiles": 65,
+  "widthProvenance": "esri-imagery",
+  "kerbProvenance": "mixed",
+  "kerbStrips": 24,
+  "measuredWidthRangeM": [
+    9.5,
+    27
+  ],
+  "pctMeasured": 86.1,
+  "imageryMeasuredAt": "2026-09-08T07:37:50.892Z",
+  "imageryNotes": "Imagery measurement 2026-09-08T07:37:50.892Z: 65 tiles, mosaic 1536x5376 px, zoom 18 (~0.56 m/px at track latitude). 86.1% of 1241 stations measured at confidence>=0.45 (304 continuity-guided), 146 interpolated over <=60 m bridges, 26 fell back to prior widths (45 dark/shadow-suspect stations). Measured full-width range 9.5-27.0 m (median 15.0 m). Kerbs: 4/24 strips imagery-detected. QA review: no TUMFTM cross-check exists for Jeddah (prior was constant 12 m). Edges follow visible road boundaries cleanly along the wall-lined street sections. The S/F-straight maximum (~25-27 m, route points ~0-8 and ~320-322) spans the full paved corridor INCLUDING the pit lane — the pit-lane separator wall is race-week temporary and invisible in imagery, so the detector cannot do better; racing width there is narrower. Shadow-driven fallbacks (building shadows mid-lap) behaved honestly."
+}
