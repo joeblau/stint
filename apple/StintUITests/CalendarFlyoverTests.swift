@@ -4,7 +4,7 @@ final class CalendarFlyoverTests: XCTestCase {
     /// A pin click only selects the venue; a second click on it flies over the circuit.
     @MainActor func testPinClicksSelectThenFlyOverTheCircuit() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-hud-auto-hide", "0"]
+        app.launchArguments += ["-hud-auto-hide", "0", "-onboarding-completed", "YES"]
         app.launchEnvironment["STINT_FORCE_FLIGHT"] = "1"
         app.launch()
         #if os(macOS)
@@ -54,7 +54,7 @@ final class CalendarFlyoverTests: XCTestCase {
 
     @MainActor func testCardFlyoverButtonStartsALowSlowPass() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-hud-auto-hide", "0"]
+        app.launchArguments += ["-hud-auto-hide", "0", "-onboarding-completed", "YES"]
         app.launchEnvironment["STINT_FORCE_FLIGHT"] = "1"
         app.launch()
         XCTAssertTrue(app.buttons["tab-calendar"].waitForExistence(timeout: 15))

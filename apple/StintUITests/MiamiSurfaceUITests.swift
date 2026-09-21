@@ -4,7 +4,7 @@ final class MiamiSurfaceUITests: XCTestCase {
     #if os(macOS)
     @MainActor func testMiamiContinuousSurfaceInLowFlyover() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-hud-auto-hide", "0"]
+        app.launchArguments += ["-hud-auto-hide", "0", "-onboarding-completed", "YES"]
         app.launch()
         XCTAssertTrue(app.buttons["tab-calendar"].waitForExistence(timeout: 15))
         app.buttons["tab-calendar"].click()
